@@ -1,0 +1,163 @@
+/* ===== If you want an easier time searching, ctrl+F then search these ===== */
+/* ===== 1. Global, 2.Text, 3.Box, 4.Header, 5.Table View, 6.Table Row, 7.Scrollbar ===== */
+
+/* ===== Global / Layout Edits ===== */
+/* ===== these might need some more work ===== */
+.mainFxmlClass { }
+#Background {
+    -fx-background-color: #282828;
+}
+#BorderPaneCenter {
+    -fx-background-color: #3b3b3b;
+    -fx-background-radius: 40px;
+    -fx-border-radius: 40px;
+}
+.root {
+    -fx-font-family: "Arial";
+}
+
+/* ===== Text Styling (Candidate/Judge Text) ===== */
+#txtCandidText {
+    -fx-fill: lightgrey;
+    -fx-font-size: 28px;
+}
+#txtCandidName {
+    -fx-fill: lightgrey;
+    -fx-font-size: 40px;
+}
+#txtAdInfo {
+    -fx-fill: lightgrey;
+    -fx-font-size: 16px;
+}
+#txtJudgeText {
+    -fx-fill: lightgrey;
+    -fx-font-size: 28px;
+}
+#txtJudgeName {
+    -fx-fill: lightgrey;
+    -fx-font-size: 40px;
+}
+
+/* ===== Box Edits Here ===== */
+#CandInfo,
+#JudInfo {
+    -fx-background-color: #3b3b3b;
+    -fx-background-radius: 40px;
+    -fx-border-radius: 40px;
+}
+#imageBox {
+    -fx-background-color: #cd7f32;
+    -fx-background-radius: 40px;
+    -fx-border-radius: 40px;
+}
+#imgCandidate {
+    -fx-padding: 10px;
+    -fx-background-radius: 40px;
+    -fx-border-radius: 40px;
+}
+
+/* ===== Table Header stuff ===== */
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+.table-view .column-header {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+/* ===== Table View & Cell things ===== */
+.table-view {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-width: 0 !important;
+    -fx-table-cell-border-color: #3b3b3b;
+    -fx-border-color: #3b3b3b !important;
+    -fx-background-color: #3b3b3b;
+    -fx-focus-color: #3b3b3b !important;
+    -fx-faint-focus-color: #3b3b3b !important;
+}
+.table-view .column-header,
+.table-view .filler,
+.table-view .corner,
+.table-view .column-header-background {
+    -fx-border-width: 0;
+    -fx-border-color: #3b3b3b;
+    -fx-background-color: #3b3b3b;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+.table-view .virtual-flow,
+.table-view .scroll-pane,
+.scroll-pane {
+    -fx-background-color: #3b3b3b !important;
+    -fx-border-width: 0 !important;
+    -fx-border-color: #3b3b3b !important;
+}
+.scroll-pane .viewport {
+    -fx-background-color: #3b3b3b !important;
+}
+
+/* ===== Table Row & Cell Edits ===== */
+.table-row-cell {
+    -fx-background-insets: 5px 0 5px 0;
+    -fx-padding: 10px 0;
+    -fx-background-radius: 50px;
+    -fx-border-radius: 50px;
+    -fx-cell-size: 40px;
+}
+.table-row-cell:odd {
+    -fx-background-color: #b1b1b1;
+}
+.table-row-cell:odd .text {
+    -fx-fill: white;
+    -fx-font-family: "Arial";
+}
+.table-row-cell:even {
+    -fx-background-color: #d8d8d8;
+}
+.table-row-cell:even .text {
+    -fx-fill: #969696;
+    -fx-font-family: "Arial";
+}
+.table-row-cell:selected .text {
+    -fx-fill: black;
+    -fx-font-family: "Arial";
+}
+.table-view .table-cell {
+    -fx-font-size: 16px;
+    -fx-alignment: center;
+    -fx-padding: 0 10px 0 8px;
+    -fx-background-radius: 90%;
+    -fx-min-width: 3px;
+    -fx-min-height: 3px;
+    -fx-font-family: "Arial";
+}
+.table-view .table-cell:first-child {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0%;
+}
+.table-view .table-cell .text {
+    -fx-background-color: transparent;
+    -fx-font-size: 16px;
+    -fx-font-family: "Arial";
+}
+
+/* ===== Scrollbar Styling ===== */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 16px;
+}
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-pref-height: 16px;
+}
+.scroll-bar .thumb {
+    -fx-background-color: #888;
+    -fx-background-insets: 3;
+    -fx-background-radius: 8;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: #aaa;
+}
