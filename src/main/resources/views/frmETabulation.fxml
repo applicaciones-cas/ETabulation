@@ -13,11 +13,10 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.control.ScrollBar?>
 
-<AnchorPane id="Background" fx:id="Background" prefHeight="700.0" prefWidth="1000.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.etabulation.FrmETabulationController">
+<AnchorPane id="Background" fx:id="Background" prefHeight="920.0" prefWidth="920.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.etabulation.FrmETabulationController">
     <stylesheets>
-        <URL value="@/css/frmetabulation.css"/>
+        <URL value="@/css/frmetabulation.css" />
     </stylesheets>
    <children>
       <BorderPane prefHeight="676.0" prefWidth="965.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -86,7 +85,7 @@
               <!-- TableView in its own container without its built-in scrollbar -->
               <VBox fx:id="tableBox" prefWidth="390.0" HBox.hgrow="ALWAYS">
                  <children>
-                    <ScrollPane id="scrollPaneTable" fx:id="scrollPaneTable" fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS" vbarPolicy="NEVER">
+                    <ScrollPane id="scrollPaneTable" fx:id="scrollPaneTable" fitToHeight="true" fitToWidth="true" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
                        <content>
                           <TableView fx:id="ResultTable" prefHeight="200.0" prefWidth="771.0" />
                        </content>

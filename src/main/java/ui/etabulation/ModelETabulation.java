@@ -1,6 +1,7 @@
 // File: ModelETabulation.java
 package ui.etabulation;
 
+import java.net.URI;
 import ui.etabulation.Conn;
 import ui.etabulation.TableModelETabulation;
 import ui.etabulation.TableModelETabulation.Result;
@@ -42,14 +43,33 @@ public class ModelETabulation {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                String name  = rs.getString("candidateName");
-                String school= rs.getString("candidateSchool");       // ← pull
-                String img   = rs.getString("imageUrl");
-
-                // zero scores for now
-                Result r = new Result(name, 0, 0, 0, 0, 0, 0,0, img, school);
+                String name     = rs.getString("candidateName");
+                String school   = rs.getString("candidateSchool");
+                String remoteUrl = rs.getString("imageUrl");
+                // e.g. "https://…/GF2025/campus/1/1.png"
+                URI uri = URI.create(remoteUrl);
+                String[] parts = uri.getPath().split("/"); 
+                // parts = ["","img","GF2025","campus","1","1.png"]
+                String folder   = parts[3];             // "campus"
+                String contnum  = parts[4];
+                String filename = parts[parts.length-1]; // "1.png"
+                
+                if ("babe".equals(folder)) {
+                    folder = "bikerbabe";
+                } else if ("bulilit".equals(folder)){
+                    folder = "bulilit";
+                } else if ("dream".equals(folder)){
+                    folder = "dreamboy";
+                } else {
+                    folder = "campus";
+                }
+                
+                String local    = "D:\\GGC_Maven_Systems\\images\\gfest\\" 
+                                  + folder + "\\" + contnum + "-" + filename;
+                Result r = new Result(name, 0,0,0,0,0,0, 0, local, school);
                 results.add(r);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

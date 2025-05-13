@@ -1,0 +1,102 @@
+
+.mainFxmlClass { }
+#Background {
+    -fx-background-color: #282828;
+}
+#BorderPaneCenter {
+    -fx-background-color: #3b3b3b;
+    -fx-background-radius: 40px;
+    -fx-border-radius: 40px;
+}
+.root {
+    -fx-font-family: "Arial";
+}
+
+/*adawdawdawdawdaw*/
+.menu-bar {
+    -fx-background-color: #505050;           
+    -fx-background-radius: 10px;             
+    -fx-border-color: #777777;               
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+
+.menu-bar .label {
+    -fx-text-fill: white;                    
+    -fx-font-weight: bold;
+}
+
+
+
+
+
+.menu-item .label {
+    -fx-text-fill: white;
+}
+
+.menu-bar .menu-button {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+
+.menu-bar .menu-button:hover,
+.menu-bar .menu-button:focused {
+    -fx-background-color: orange;         
+    -fx-background-radius: 8px;
+}
+.menu-bar .menu-button:hover .label,
+.menu-bar .menu-button:focused .label {
+    -fx-text-fill: white;
+}
+
+
+.menu-bar .menu:hover {
+    -fx-effect: dropshadow(one-pass-box, orange, 8, 0.0, 0, 0);
+    -fx-cursor: hand;
+}
+
+
+/* --- Popup menu items on hover/armed/selected --- */
+.menu-item:hover,
+.menu-item:armed,
+.menu-item:selected {
+    -fx-background-color: orange;
+}
+.menu-item:hover .label,
+.menu-item:armed .label,
+.menu-item:selected .label {
+    -fx-text-fill: white;
+}
+
+
+/* 1. Style the dropdown container */
+.context-menu {
+    -fx-background-color: #505050;         /* match your menu-bar */
+    -fx-background-radius: 10px;
+    -fx-border-color: #777777;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+/* 2. Make sure items inside aren’t still white boxes */
+.context-menu .menu-item {
+    -fx-background-color: transparent;
+}
+
+/* 3. Keep your hover glow on those items */
+.context-menu .menu-item:hover,
+.context-menu .menu-item:armed,
+.context-menu .menu-item:selected {
+    -fx-background-color: orange;
+    -fx-background-radius: 10px;
+}
+
+
+#BannerBoxV {
+  -fx-padding: 10 20 0 20;
+}
+#imgBanner {
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+}
