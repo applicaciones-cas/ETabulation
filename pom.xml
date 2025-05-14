@@ -17,5 +17,17 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
         </dependency>
+        <dependency>
+            <groupId>org.guanzon</groupId>
+            <artifactId>gtabulate</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Guanzon-Central-Repository Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/mtcuison/Guanzon-Central-Repository/</url>
+        </repository>
+    </distributionManagement>
 </project>

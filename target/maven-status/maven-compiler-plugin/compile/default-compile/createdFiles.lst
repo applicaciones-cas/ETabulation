@@ -1,3 +1,5 @@
+ui\etabulation\MainMenu.class
+ui\etabulation\MainMenuController.class
 ui\etabulation\Crypter.class
 ui\etabulation\ETabulationUtils$1.class
 ui\etabulation\TableModelETabulation.class
