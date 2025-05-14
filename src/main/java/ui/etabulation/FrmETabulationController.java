@@ -1,5 +1,6 @@
 package ui.etabulation;
 
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -131,8 +132,8 @@ public class FrmETabulationController implements Initializable {
         
 
         imgBanner.fitWidthProperty().bind(Background.widthProperty());
-        tableBox.prefWidthProperty().bind(Background.widthProperty().multiply(0.6));
-        imageBox.prefWidthProperty().bind(Background.widthProperty().multiply(0.2));
+        tableBox.prefWidthProperty().bind(Background.widthProperty().multiply(0.5));
+        imageBox.prefWidthProperty().bind(Background.widthProperty().multiply(0.3));
         imageBox.setAlignment(Pos.CENTER);
         imgBanner.fitHeightProperty().bind(BannerBox.heightProperty());
         imgBanner.setPreserveRatio(false);
@@ -196,13 +197,34 @@ public class FrmETabulationController implements Initializable {
         });
 
         
-        ResultTable.getSelectionModel().selectedItemProperty().addListener((obs, oldS, newS) -> {
-            if (newS != null) {
-                imgCandidate.setImage(new Image(newS.getImageUrl()));
-                txtAdInfo.setText(newS.getSchool());
-                txtCandidName.setText(newS.getCandidates());
+//        ResultTable.getSelectionModel().selectedItemProperty().addListener((obs, oldS, newS) -> {
+//            if (newS != null) {
+//                imgCandidate.setImage(new Image(newS.getImageUrl()));
+//                txtAdInfo.setText(newS.getSchool());
+//                txtCandidName.setText(newS.getCandidates());
+//            }
+//        });
+
+        ResultTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            if (newSel != null) {
+                // absolute path from your model, e.g. "D:\\GGC_Maven_Systems\\images\\alice.png"
+                String fullPath = newSel.getImageUrl();
+                File imgFile = new File(fullPath);
+
+                if (imgFile.exists()) {
+                    String uri = imgFile.toURI().toString(); 
+                    // e.g. "file:/D:/GGC_Maven_Systems/images/alice.png"
+                    imgCandidate.setImage(new Image(uri));
+                } else {
+                    // fallback placeholder
+                    imgCandidate.setImage(new Image("D:\\GGC_Maven_Systems\\images\\alice.png"));
+                }
+
+                txtCandidName.setText(newSel.getCandidates());
+                txtAdInfo.setText(newSel.getSchool());
             }
         });
+
         
 
         Platform.runLater(() -> {
