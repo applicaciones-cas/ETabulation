@@ -1,79 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.net.URL?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="Background" fx:id="Background" prefHeight="750.0" prefWidth="900.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.etabulation.MainMenuController">
+<AnchorPane id="Background" fx:id="apMain" style="-fx-background-color: linear-gradient(to bottom right, #1a1a1a, #2e2e2e, #1c1c1c);; -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.etabulation.MainMenuController">
     <stylesheets>
         <URL value="@/css/mainmenu.css" />
     </stylesheets>
    <children>
-      <BorderPane layoutX="10.0" layoutY="10.0" prefHeight="676.0" prefWidth="965.0">
+      <BorderPane layoutX="10.0" layoutY="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
-            <HBox fx:id="BannerBoxH" prefHeight="24.0" prefWidth="965.0" BorderPane.alignment="CENTER_LEFT">
+            <AnchorPane fx:id="apBorderBanner" style="-: ;" BorderPane.alignment="CENTER">
                <children>
-                  <VBox id="BannerBoxV" fx:id="BannerBoxV" prefHeight="100.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
+                  <AnchorPane fx:id="apAnchorBanner" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                      <children>
-                        <ImageView id="imgBanner" fx:id="imgBanner"
-                                   fitHeight="80"
-                                   preserveRatio="true"
-                                   pickOnBounds="true"
-                                   HBox.hgrow="ALWAYS" />
-
-
-                            
-
-                        <MenuBar>
-                          <menus>
-                            <Menu mnemonicParsing="false" text="File">
-                              <items>
-                                <MenuItem mnemonicParsing="false" text="Close" />
-                              </items>
-                            </Menu>
-                            <Menu mnemonicParsing="false" text="Voting">
-                              <items>
-                                <MenuItem id="etabulation" fx:id="etabulation" mnemonicParsing="false" text="Scoring" />
-                              </items>
-                            </Menu>
-                            <Menu mnemonicParsing="false" text="Help">
-                              <items>
-                                <MenuItem mnemonicParsing="false" text="About" />
-                              </items>
-                            </Menu>
-                          </menus>
-                        </MenuBar>
+                        <VBox id="BannerBoxV" fx:id="vbBanner" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <AnchorPane style="-fx-border-radius: 15;">
+                                 <children>
+                                    <ImageView fitHeight="100.0" fitWidth="1890.0" pickOnBounds="true" smooth="false" style="-fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2); -fx-opacity: 40%;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <image>
+                                          <Image url="@../images/BannerMainMenu2025.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fitWidth="230.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                       <image>
+                                          <Image url="@../images/2025Logo%20(1).png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane>
+                                 <children>
+            
+                        
+                                                    
+                        
+                                                <MenuBar AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                      <menus>
+                                        <Menu mnemonicParsing="false" text="File">
+                                          <items>
+                                            <MenuItem mnemonicParsing="false" text="Close" />
+                                          </items>
+                                        </Menu>
+                                        <Menu mnemonicParsing="false" text="Voting">
+                                          <items>
+                                            <MenuItem id="etabulation" fx:id="etabulation" mnemonicParsing="false" text="Scoring" />
+                                          </items>
+                                        </Menu>
+                                        <Menu mnemonicParsing="false" text="Help">
+                                          <items>
+                                            <MenuItem mnemonicParsing="false" text="About" />
+                                          </items>
+                                        </Menu>
+                                      </menus>
+                                    </MenuBar>
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </VBox>
                      </children>
-                  </VBox>
+                  </AnchorPane>
                </children>
-            </HBox>
+            </AnchorPane>
          </top>
-         <bottom>
-            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-         </bottom>
          <center>
-            <HBox spacing="10.0" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets bottom="20.0" left="5.0" right="5.0" top="20.0" />
-               </BorderPane.margin>
-               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </padding>
-            </HBox>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <AnchorPane AnchorPane.leftAnchor="500.0" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="250.0">
+                     <children>
+                        <ImageView fitWidth="800.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
+                           <image>
+                              <Image url="@../images/2025Logo%20(1).png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+               </children></AnchorPane>
          </center>
-         <right>
-            <HBox prefHeight="531.0" prefWidth="40.0" BorderPane.alignment="CENTER" />
-         </right>
-         <left>
-            <HBox prefHeight="531.0" prefWidth="40.0" BorderPane.alignment="CENTER" />
-         </left>
+         <bottom>
+            <AnchorPane BorderPane.alignment="CENTER" />
+         </bottom>
       </BorderPane>
    </children>
 </AnchorPane>
