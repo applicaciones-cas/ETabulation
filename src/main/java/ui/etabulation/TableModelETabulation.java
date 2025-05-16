@@ -1,5 +1,6 @@
 package ui.etabulation;
 
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -7,13 +8,13 @@ public class TableModelETabulation {
     public static class Result {
 
         private final SimpleStringProperty candidates;
-        private final SimpleIntegerProperty sportswear;
-        private final SimpleIntegerProperty filipiniana;
-        private final SimpleIntegerProperty talent;
-        private final SimpleIntegerProperty personality;
-        private final SimpleIntegerProperty beauty;
-        private final SimpleIntegerProperty audience;
-        public final SimpleIntegerProperty total; 
+        private final SimpleDoubleProperty sportswear;
+        private final SimpleDoubleProperty filipiniana;
+        private final SimpleDoubleProperty talent;
+        private final SimpleDoubleProperty personality;
+        private final SimpleDoubleProperty beauty;
+        private final SimpleDoubleProperty audience;
+        public final SimpleDoubleProperty total; 
         private final SimpleStringProperty imageUrl;
         private final SimpleStringProperty school;  
 
@@ -22,20 +23,21 @@ public class TableModelETabulation {
                       int personality, int beauty, int audience, int dummyTotal, String imageUrl, String school) {
                       
             this.candidates = new SimpleStringProperty(candidates);
-            this.sportswear = new SimpleIntegerProperty(sportswear);
-            this.filipiniana = new SimpleIntegerProperty(filipiniana);
-            this.talent = new SimpleIntegerProperty(talent);
-            this.personality = new SimpleIntegerProperty(personality);
-            this.beauty = new SimpleIntegerProperty(beauty);
-            this.audience = new SimpleIntegerProperty(audience);
-            this.total = new SimpleIntegerProperty(0);
-            this.total.bind(
-                this.sportswear.add(this.filipiniana)
-                               .add(this.talent)
-                               .add(this.personality)
-                               .add(this.beauty)
-                               .add(this.audience)
-            );
+            this.sportswear = new SimpleDoubleProperty(sportswear);
+            this.filipiniana = new SimpleDoubleProperty(filipiniana);
+            this.talent = new SimpleDoubleProperty(talent);
+            this.personality = new SimpleDoubleProperty(personality);
+            this.beauty = new SimpleDoubleProperty(beauty);
+            this.audience = new SimpleDoubleProperty(audience);
+//            this.total = new SimpleIntegerProperty(0);
+//            this.total.bind(
+//                this.sportswear.add(this.filipiniana)
+//                               .add(this.talent)
+//                               .add(this.personality)
+//                               .add(this.beauty)
+//                               .add(this.audience)
+//            );
+            this.total = new SimpleDoubleProperty(dummyTotal);
             this.imageUrl = new SimpleStringProperty(imageUrl);
             this.school   = new SimpleStringProperty(school);
         }
@@ -44,25 +46,25 @@ public class TableModelETabulation {
         public String getCandidates() {
             return candidates.get();
         }
-        public int getSportswear() {
+        public double getSportswear() {
             return sportswear.get();
         }
-        public int getFilipiniana() {
+        public double getFilipiniana() {
             return filipiniana.get();
         }
-        public int getTalent() {
+        public double getTalent() {
             return talent.get();
         }
-        public int getPersonality() {
+        public double getPersonality() {
             return personality.get();
         }
-        public int getBeauty() {
+        public double getBeauty() {
             return beauty.get();
         }
-        public int getAudience() {
+        public double getAudience() {
             return audience.get();
         }
-        public int getTotal() {
+        public double getTotal() {
             return total.get();
         }
         public String getImageUrl() {
@@ -76,26 +78,26 @@ public class TableModelETabulation {
         public void setCandidates(String candidates) {
             this.candidates.set(candidates);
         }
-        public void setSportswear(int sportswear) {
+        public void setSportswear(double sportswear) {
             this.sportswear.set(sportswear);
         }
-        public void setFilipiniana(int filipiniana) {
+        public void setFilipiniana(double filipiniana) {
             this.filipiniana.set(filipiniana);
         }
-        public void setTalent(int talent) {
+        public void setTalent(double talent) {
             this.talent.set(talent);
         }
-        public void setPersonality(int personality) {
+        public void setPersonality(double personality) {
             this.personality.set(personality);
         }
-        public void setBeauty(int beauty) {
+        public void setBeauty(double beauty) {
             this.beauty.set(beauty);
         }
-        public void setAudience(int audience) {
+        public void setAudience(double audience) {
             this.audience.set(audience);
         }
         
-        public void setTotal(int total) {
+        public void setTotal(double total) {
             this.total.set(total);
         }
         public void setSchool(String school) {
@@ -105,7 +107,7 @@ public class TableModelETabulation {
         public SimpleStringProperty schoolProperty() { return school; }
 
         
-        public SimpleIntegerProperty totalProperty() {
+        public SimpleDoubleProperty totalProperty() {
             return total;
         }
     }
