@@ -3,6 +3,7 @@ package ui.etabulation;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,31 +18,41 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MainMenuController implements Initializable {
-
-    @FXML
-    private MenuItem etabulation;
-    @FXML private HBox BannerBoxH;
+    @FXML private MenuItem etabulation, about, closeApp;
+    @FXML private ImageView imgBanner;
     @FXML private VBox BannerBoxV;
-    @FXML
-    private ImageView imgBanner;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        etabulation.setOnAction(this::handleScoring);
         imgBanner.setImage(new Image(getClass().getResourceAsStream("/images/BannerSample.png")));
         imgBanner.fitWidthProperty().bind(BannerBoxV.widthProperty());
     }
 
-    private void handleScoring(ActionEvent event) {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/views/frmETabulation.fxml"));
+    @FXML
+    private void handleMenu(ActionEvent event) {
+        MenuItem src = (MenuItem) event.getSource();
+        switch (src.getId()) {
+            case "etabulation":
+                openWindow("/views/frmETabulation.fxml", "Scoring Module");
+                break;
+            case "about":
+                openWindow("/views/About.fxml", "About This App");
+                break;
+            case "closeApp":
+                Platform.exit();
+                break;
+            default:
+                System.err.println("Unhandled menu: " + src.getId());
+        }
+    }
 
-            
+    private void openWindow(String fxmlPath, String title) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = new Stage();
-            stage.setTitle("Scoring Module");
+            stage.setTitle(title);
             stage.setScene(new Scene(root));
             stage.show();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
