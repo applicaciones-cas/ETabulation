@@ -51,9 +51,10 @@
                                             <MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#handleMenu" text="Close" />
                                           </items>
                                         </Menu>
-                                        <Menu mnemonicParsing="false" text="Voting">
+                                        <Menu mnemonicParsing="false" text="Event">
                                           <items>
                                             <MenuItem fx:id="mnuScoring" mnemonicParsing="false" onAction="#handleMenu" text="Scoring" />
+                                                <MenuItem fx:id="mnuBingo" mnemonicParsing="false" onAction="#handleMenu" text="G - Bingo" />
                                           </items>
                                         </Menu>
                                         <Menu mnemonicParsing="false" text="Help">

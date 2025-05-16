@@ -33,7 +33,7 @@ public class MainMenuController implements Initializable {
     public static GRider oApp;
 
     @FXML
-    private MenuItem mnuAbout, mnuScoring, mnuClose;
+    private MenuItem mnuAbout, mnuScoring, mnuClose,mnuBingo;
     @FXML
     private Pane pnMainCenter;
 
@@ -48,6 +48,9 @@ public class MainMenuController implements Initializable {
     private void handleMenu(ActionEvent event) {
         MenuItem src = (MenuItem) event.getSource();
         switch (src.getId()) {
+            case "mnuBingo":
+                openWindow("/views/frmETabulation.fxml", "Guanzon Bingo");
+                break;
             case "mnuScoring":
                 openWindow("/views/frmETabulation.fxml", "Scoring Module");
                 break;
