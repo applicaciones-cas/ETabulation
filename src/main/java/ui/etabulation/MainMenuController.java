@@ -64,19 +64,19 @@ public class MainMenuController implements Initializable {
 
     private void openWindow(String fxmlPath, String title) {
         try {
-            
+
             //get the screen size
             Screen screen = Screen.getPrimary();
             Rectangle2D bounds = screen.getVisualBounds();
             Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
-            
+
             Stage stage = new Stage();
-             // set stage as maximized but not full screen
+            // set stage as maximized but not full screen
             stage.setX(bounds.getMinX());
             stage.setY(bounds.getMinY());
             stage.setWidth(bounds.getWidth());
             stage.setHeight(bounds.getHeight());
-            
+
             stage.setTitle(title);
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setScene(new Scene(root));
@@ -93,8 +93,12 @@ public class MainMenuController implements Initializable {
 
     public void launchConfetti(Pane root) {
         Random random = new Random();
+
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+        double screenHeight = bounds.getHeight();
         int width = (int) (root.getWidth() > 0 ? root.getWidth() : 400);
-        int height = (int) (root.getHeight() > 0 ? root.getHeight() : 900);
+        int height = (int) (screenHeight);
 
         for (int i = 0; i < 30; i++) {
             Circle confetti = new Circle(4);
