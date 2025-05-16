@@ -8,9 +8,10 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="Background" fx:id="apMain" style="-fx-background-color: linear-gradient(to bottom right, #1a1a1a, #2e2e2e, #1c1c1c);; -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.etabulation.MainMenuController">
+<AnchorPane id="Background" fx:id="apMain" style="-fx-background-color: linear-gradient(to bottom right, #1a1a1a, #2e2e2e, #1c1c1c);; -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
     <stylesheets>
         <URL value="@/css/mainmenu.css" />
     </stylesheets>
@@ -47,17 +48,17 @@
                                       <menus>
                                         <Menu mnemonicParsing="false" text="File">
                                           <items>
-                                            <MenuItem mnemonicParsing="false" text="Close" />
+                                            <MenuItem fx:id="mnuClose" mnemonicParsing="false" onAction="#handleMenu" text="Close" />
                                           </items>
                                         </Menu>
                                         <Menu mnemonicParsing="false" text="Voting">
                                           <items>
-                                            <MenuItem id="etabulation" fx:id="etabulation" mnemonicParsing="false" text="Scoring" />
+                                            <MenuItem fx:id="mnuScoring" mnemonicParsing="false" onAction="#handleMenu" text="Scoring" />
                                           </items>
                                         </Menu>
                                         <Menu mnemonicParsing="false" text="Help">
                                           <items>
-                                            <MenuItem mnemonicParsing="false" text="About" />
+                                            <MenuItem fx:id="mnuAbout" mnemonicParsing="false" onAction="#handleMenu" text="About" />
                                           </items>
                                         </Menu>
                                       </menus>
@@ -83,6 +84,7 @@
                         </ImageView>
                      </children>
                   </AnchorPane>
+                  <Pane fx:id="pnMainCenter" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0" />
                </children></AnchorPane>
          </center>
          <bottom>
