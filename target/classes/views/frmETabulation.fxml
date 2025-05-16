@@ -46,8 +46,8 @@
                           </rowConstraints>
                            <children>
                               <Text id="txtCandidText" fx:id="txtCandidText" strokeType="OUTSIDE" strokeWidth="0.0" text="Candidate Information:" GridPane.halignment="LEFT" />
-                              <Text id="txtCandidName" fx:id="txtCandidName" strokeType="OUTSIDE" strokeWidth="0.0" text="Name Here" GridPane.rowIndex="1" />
-                              <Text id="txtAdInfo" fx:id="txtAdInfo" strokeType="OUTSIDE" strokeWidth="0.0" text="School here??" GridPane.rowIndex="2" />
+                              <Text id="txtCandidName" fx:id="txtCandidName" strokeType="OUTSIDE" strokeWidth="0.0" text="Name" GridPane.rowIndex="1" />
+                              <Text id="txtAdInfo" fx:id="txtAdInfo" strokeType="OUTSIDE" strokeWidth="0.0" text="School" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
                      </children>
@@ -70,7 +70,7 @@
                            </rowConstraints>
                            <children>
                               <Text id="txtJudgeText" fx:id="txtJudgeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Judge:" GridPane.halignment="LEFT" />
-                              <Text id="txtJudgeName" fx:id="txtJudgeName" strokeType="OUTSIDE" strokeWidth="0.0" text="Name Here" GridPane.rowIndex="1" />
+                              <Text id="txtJudgeName" fx:id="txtJudgeName" strokeType="OUTSIDE" strokeWidth="0.0" text="Name" GridPane.rowIndex="1" />
                            </children>
                         </GridPane>
                      </children>
