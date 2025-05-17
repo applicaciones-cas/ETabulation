@@ -115,12 +115,16 @@ public class MainMenuController implements Initializable {
     }
 
     private Object getUIController(String fsMenuForm) {
+        GBingoController GBingoCtrl;
         switch (fsMenuForm) {
             case "GuanzonBingo1080":
             case "GuanzonBingo1080Neo":
+                GBingoCtrl = new GBingoController();
+                GBingoCtrl.setScreenSize(1080);
             case "GuanzonBingo1920":
             case "GuanzonBingo1920Neo":
-                GBingoController GBingoCtrl = new GBingoController();
+                GBingoCtrl = new GBingoController();
+                GBingoCtrl.setScreenSize(1920);
                 //todo incase
                 return GBingoCtrl;
             case "frmETabulation":
