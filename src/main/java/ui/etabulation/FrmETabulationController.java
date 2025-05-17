@@ -5,12 +5,16 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
@@ -42,6 +46,7 @@ import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
 import ui.etabulation.TableModelETabulation.Result;
 import ui.etabulation.ETabulationUtils; 
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
 
 public class FrmETabulationController extends Transaction implements Initializable{
@@ -334,6 +339,26 @@ public class FrmETabulationController extends Transaction implements Initializab
         });
 
         
+        Platform.runLater(() -> {
+            Scene scene = Background.getScene();
+            scene.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+                if (evt.getCode() == KeyCode.ESCAPE) {
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Are you sure you want to exit?", 
+                        ButtonType.YES, ButtonType.NO);
+                    confirm.setTitle("Confirm Exit");
+                    confirm.setHeaderText(null);
+
+                    Optional<ButtonType> result = confirm.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.YES) {
+                        Stage stage = (Stage) scene.getWindow();
+                        stage.close();
+                    }
+                    evt.consume();
+                }
+            });
+        });
+
 
         Platform.runLater(() -> {
             for (Node node : ResultTable.lookupAll(".column-header .label")) {
