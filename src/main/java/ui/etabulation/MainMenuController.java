@@ -22,6 +22,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -33,7 +34,7 @@ public class MainMenuController implements Initializable {
     public static GRider oApp;
 
     @FXML
-    private MenuItem mnuAbout, mnuScoring, mnuClose,mnuBingo;
+    private MenuItem mnuAbout, mnuScoring, mnuClose, mnuBingo;
     @FXML
     private Pane pnMainCenter;
 
@@ -46,48 +47,92 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private void handleMenu(ActionEvent event) {
-        MenuItem src = (MenuItem) event.getSource();
-        switch (src.getId()) {
+        MenuItem mnuName = (MenuItem) event.getSource();
+        String lsFormMenu = mnuName.getId();
+        switch (lsFormMenu) {
             case "mnuBingo":
-                openWindow("/views/frmETabulation.fxml", "Guanzon Bingo");
+                openWindow("GuanzonBingo1920", "Guanzon E - Bingo", false);
+//                openWindow("GuanzonBingo1920Neo", "Guanzon E - Bingo");
+//                openWindow("GuanzonBingo1080", "Guanzon E - Bingo");
+//                openWindow("GuanzonBingo1080Neo", "Guanzon E - Bingo");
                 break;
             case "mnuScoring":
-                openWindow("/views/frmETabulation.fxml", "Scoring Module");
+                openWindow("frmETabulation", "Scoring Module", true);
                 break;
             case "mnuAbout":
-                openWindow("/views/About.fxml", "About This App");
+                openWindow("About", "About This App", false);
                 break;
             case "mnuClose":
                 Platform.exit();
                 break;
             default:
-                System.err.println("Unhandled menu: " + src.getId());
+                System.err.println("Unhandled menu: " + lsFormMenu);
         }
     }
 
-    private void openWindow(String fxmlPath, String title) {
+    private void openWindow(String fsFormName, String fsTitle, boolean isMaximized) {
         try {
+            Stage newScene = new Stage();
 
-            //get the screen size
-            Screen screen = Screen.getPrimary();
-            Rectangle2D bounds = screen.getVisualBounds();
-            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
+            FXMLLoader fxLoader = new FXMLLoader();
+            Object fxObj = getUIController(fsFormName);
 
-            Stage stage = new Stage();
-            // set stage as maximized but not full screen
-            stage.setX(bounds.getMinX());
-            stage.setY(bounds.getMinY());
-            stage.setWidth(bounds.getWidth());
-            stage.setHeight(bounds.getHeight());
+            if (fxObj == null) {
+                System.err.println("No controller found for form: " + fsFormName);
+                return;
+            }
+            URL fxURLResource = getClass().getResource("/views/" + fsFormName + ".fxml");
+            if (fxURLResource == null) {
+                System.err.println("FXML file not found: /views/" + fsFormName + ".fxml");
+                return;
+            }
+            fxLoader.setLocation(fxURLResource);
+            fxLoader.setController(fxObj);
 
-            stage.setTitle(title);
-            stage.initStyle(StageStyle.UNDECORATED);
-            stage.setScene(new Scene(root));
-            stage.centerOnScreen();
-            stage.show();
+            Parent foParent = fxLoader.load();
+
+            if (isMaximized) {
+                //get the screen size
+                Screen screen = Screen.getPrimary();
+                Rectangle2D bounds = screen.getVisualBounds();
+
+                // set stage as maximized but not full screen
+                newScene.setX(bounds.getMinX());
+                newScene.setY(bounds.getMinY());
+                newScene.setWidth(bounds.getWidth());
+                newScene.setHeight(bounds.getHeight());
+            }
+            Scene childScene = new Scene(foParent);
+            newScene.setTitle(fsTitle);
+            newScene.setScene(childScene);
+            newScene.initStyle(StageStyle.UNDECORATED);
+            newScene.initModality(Modality.APPLICATION_MODAL);
+            newScene.centerOnScreen();
+            newScene.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private Object getUIController(String fsMenuForm) {
+        switch (fsMenuForm) {
+            case "GuanzonBingo1080":
+            case "GuanzonBingo1080Neo":
+            case "GuanzonBingo1920":
+            case "GuanzonBingo1920Neo":
+                GBingoController GBingoCtrl = new GBingoController();
+                //todo incase
+                return GBingoCtrl;
+            case "frmETabulation":
+                FrmETabulationController Etabulation = new FrmETabulationController();
+                //todo incase
+                return Etabulation;
+
+            default:
+                return null;
+
+        }
+
     }
 
     void setGRider(GRider poApp) {

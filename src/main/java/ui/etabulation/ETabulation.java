@@ -25,6 +25,7 @@ public class ETabulation extends Application{
     @Override
     public void start(Stage primaryStage) {
         try {
+            
             FXMLLoader view = new FXMLLoader();
             view.setLocation(getClass().getResource(pxeMainForm));
 
