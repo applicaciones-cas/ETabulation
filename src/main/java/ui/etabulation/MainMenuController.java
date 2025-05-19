@@ -30,10 +30,11 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRider;
+import org.guanzon.appdriver.base.GRiderCAS;
 
 public class MainMenuController implements Initializable {
 
-    public static GRider oApp;
+    public static GRiderCAS oApp;
     private final List<TranslateTransition> confettiAnimations = new ArrayList<>();
     private boolean isConfettiRunning = false;
 
@@ -149,7 +150,7 @@ public class MainMenuController implements Initializable {
 
     }
 
-    void setGRider(GRider poApp) {
+    void setGRider(GRiderCAS poApp) {
         oApp = poApp;
     }
 

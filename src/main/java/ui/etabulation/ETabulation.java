@@ -12,6 +12,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.guanzon.appdriver.base.GRider;
+import org.guanzon.appdriver.base.GRiderCAS;
 /**
  *
  * @author user
@@ -20,7 +21,7 @@ public class ETabulation extends Application{
 
     public final static String pxeMainFormTitle = "E - Tabulation";
     public final static String pxeMainForm = "/views/MainMenu.fxml";
-    public static GRider oApp;
+    public static GRiderCAS oApp;
 
     @Override
     public void start(Stage primaryStage) {
@@ -60,7 +61,7 @@ public class ETabulation extends Application{
         launch(args);
     }
 
-    public void setGRider(GRider foValue) {
+    public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
 }

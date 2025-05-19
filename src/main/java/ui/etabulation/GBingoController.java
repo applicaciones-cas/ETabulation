@@ -61,7 +61,7 @@ public class GBingoController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         //to do list
         oTrans = new TabulationControllers(oApp, null).Bingo();
-        
+
         btnBrowse.setOnAction(this::cmdButton_Click);
         btnNew.setOnAction(this::cmdButton_Click);
         btnReset.setOnAction(this::cmdButton_Click);
@@ -69,7 +69,6 @@ public class GBingoController implements Initializable {
         txtDrawnNo.setOnKeyPressed(this::txtField_KeyPressed);
         initDrawLabel();
         initDrawGrid();
-        setPatternBingo();
     }
 
     public void setScreenSize(int screenSize) {
@@ -204,6 +203,8 @@ public class GBingoController implements Initializable {
             event.consume();
             break;
             case F3:
+
+                setPatternBingo();
                 return;
             case UP:
                 event.consume();
