@@ -12,9 +12,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import org.guanzon.appdriver.agent.ShowMessageFX;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
 
 public class GBingoController implements Initializable {
@@ -25,9 +30,9 @@ public class GBingoController implements Initializable {
     @FXML
     private AnchorPane apMain;
     @FXML
-    private Button btnBack;
+    private Button btnBrowse;
     @FXML
-    private Button btnNext;
+    private Button btnNew;
     @FXML
     private Button btnReset;
     @FXML
@@ -46,9 +51,11 @@ public class GBingoController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //to do list
-        btnBack.setOnAction(this::cmdButton_Click);
-        btnNext.setOnAction(this::cmdButton_Click);
+        btnBrowse.setOnAction(this::cmdButton_Click);
+        btnNew.setOnAction(this::cmdButton_Click);
         btnReset.setOnAction(this::cmdButton_Click);
+
+        txtDrawnNo.setOnKeyPressed(this::txtField_KeyPressed);
         initDrawLabel();
         initDrawGrid();
     }
@@ -62,16 +69,32 @@ public class GBingoController implements Initializable {
         String lsButton = ((Button) event.getSource()).getId();
 
         switch (lsButton) {
+            case "btnBrowse":
+            case "btnNew":
+                 if (ShowMessageFX.YesNo(null, "New Bingo", "Are you sure, do you want to New Transaction?") == false) {
+                 return;
+                 }
+            case "btnReset":
+                 if (ShowMessageFX.YesNo(null, "Reset Bingo", "Are you sure, do you want to Reset?") == false) {
+                 return;
+                 }
+                initDrawLabel();
+                initDrawGrid();
+
+                break;
         }
     }
 
     private void initDrawLabel() {
         lblDrawLetter.setText("");
         lblDrawNo.setText("");
+        txtDrawnNo.setText("");
+
     }
 
     private void initDrawGrid() {
         gpDrawPanel.getChildren().clear();
+        CtrlBingoNo.clear();
         initBingoLetter();
         initBingoNo();
     }
@@ -130,7 +153,69 @@ public class GBingoController implements Initializable {
         }
         return CtrlBingoNo.get(lnCtrlNo - 1);
     }
-    
-    
+
+    @FXML
+    private void MainAnchorPane_Keypress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            if (ShowMessageFX.YesNo(null, "Exit", "Are you sure, do you want to close?") == true) {
+                Stage stage = (Stage) apMain.getScene().getWindow();
+
+                oApp = null;
+                stage.close();
+            }
+        }
+    }
+
+    private void txtField_KeyPressed(KeyEvent event) {
+        TextField txtField = (TextField) event.getSource();
+        String lnTextNm = txtField.getId();
+
+        if (event.getCode() == KeyCode.TAB
+                || event.getCode() == KeyCode.ENTER
+                || event.getCode() == KeyCode.F3) {
+            switch (lnTextNm) {
+
+                case "txtDrawnNo":
+                try {
+                    int lnDrawNo = Integer.parseInt(txtField.getText());
+
+                    if (lnDrawNo >= 1 && lnDrawNo <= 75) {
+                        ModelBingoNoController controller = getControllerByNumber(lnDrawNo);
+                        if (controller != null) {
+                            controller.setNoVisible(true);
+                            setDrawRecord(lnDrawNo);
+                            txtDrawnNo.setText("");
+                        }
+                    }
+                } catch (NumberFormatException ex) {
+                    System.err.println("Invalid number entered: " + txtField.getText());
+                    txtField.setText("");
+                }
+                break;
+            }
+
+            event.consume();
+            CommonUtils.SetNextFocus(
+                    (TextField) event.getSource());
+        } else if (event.getCode() == KeyCode.UP) {
+            event.consume();
+            CommonUtils.SetPreviousFocus((TextField) event.getSource());
+        }
+    }
+
+    private void setDrawRecord(int lnDrawNo) {
+        if (lnDrawNo < 1 || lnDrawNo > 75) {
+            lblDrawLetter.setText("?");
+            lblDrawNo.setText("");
+            return;
+        }
+
+        int index = (lnDrawNo - 1) / 15;
+        String lsDrawLetter = bingoLetters[index];
+
+        lblDrawLetter.setText(lsDrawLetter);
+        lblDrawNo.setText(String.valueOf(lnDrawNo));
+
+    }
 
 }

@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="apMain" prefHeight="380.0" prefWidth="1080.0" style="-fx-background-color: linear-gradient(to bottom right, #ffffff, #ffeaff, #e0fff4, #fffbcf, #e5e0ff); -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="apMain" onKeyPressed="#MainAnchorPane_Keypress" prefHeight="380.0" prefWidth="1080.0" style="-fx-background-color: linear-gradient(to bottom right, #ffffff, #ffeaff, #e0fff4, #fffbcf, #e5e0ff); -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="20.0">
          <left>
@@ -63,12 +63,12 @@
                                  <children>
                                     <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="30.0" style="-fx-background-color: #102E50; -fx-background-radius: 8;">
                                        <graphic>
-                                          <FontAwesomeIconView glyphName="MAIL_REPLY" size="11" style="-fx-fill: WHITE;" />
+                                          <FontAwesomeIconView glyphName="SEARCH" size="11" style="-fx-fill: WHITE;" />
                                        </graphic>
                                     </Button>
                                     <Button maxHeight="25.0" maxWidth="25.0" mnemonicParsing="false" style="-fx-background-color: #102E50; -fx-background-radius: 8;">
                                        <graphic>
-                                          <FontAwesomeIconView glyphName="MAIL_FORWARD" size="11" style="-fx-fill: white;" />
+                                          <FontAwesomeIconView glyphName="PLAY" size="11" style="-fx-fill: white;" />
                                        </graphic>
                                     </Button>
                                     <Button maxHeight="25.0" maxWidth="25.0" mnemonicParsing="false" style="-fx-background-color: RED; -fx-background-radius: 8;" textFill="WHITE">
