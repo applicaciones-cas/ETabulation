@@ -1,22 +1,31 @@
 package ui.etabulation;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -26,10 +35,21 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import org.guanzon.appdriver.agent.services.Transaction;
+import org.guanzon.appdriver.base.GRiderCAS;
+import org.guanzon.appdriver.base.MiscUtil;
+import org.json.simple.JSONObject;
+import ph.com.guanzongroup.gtabulate.Scoring;
+import ph.com.guanzongroup.gtabulate.model.Model_Contest_Participants;
+import ph.com.guanzongroup.gtabulate.model.Model_Contest_Participants_Meta;
+import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
 import ui.etabulation.TableModelETabulation.Result;
 import ui.etabulation.ETabulationUtils; 
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
+import javafx.util.converter.DoubleStringConverter;
 
-public class FrmETabulationController implements Initializable {
+public class FrmETabulationController extends Transaction implements Initializable{
 
     @FXML private AnchorPane Background;
     @FXML private ScrollPane scrollPaneTable;
@@ -39,17 +59,63 @@ public class FrmETabulationController implements Initializable {
     @FXML private VBox CandidateBox;
     @FXML private ImageView imgBanner;
     @FXML private ImageView imgCandidate;
-    @FXML private TableView<Result> ResultTable;
+    @FXML private TableView<TableModelETabulation.Result> ResultTable;
     @FXML private VBox tableBox;
     @FXML private VBox imageBox;
     @FXML private Text txtAdInfo;
     @FXML private Text txtCandidName;
+    @FXML private Text txtJudgeName;
     
-
-    private ModelETabulation service = new ModelETabulation("D:\\GGC_Maven_Systems\\testing.ini");
+    static GRiderCAS gRider;
+    
+    
+    private Scoring scoring;
+    private final String contestId = "00001";      
+    private final String judgeName = "Waluigi";  
+    
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        
+        
+        final double PERFECT = 70.0;
+        final double W_SW = 15, W_FL = 15, W_TA = 20, W_PE = 25, W_BE = 25, W_AU = 10;
+
+        gRider = MiscUtil.Connect();
+        
+        String path;
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            path = "D:/GGC_Maven_Systems";
+        } else {
+            path = "/srv/GGC_Maven_Systems";
+        }
+        System.setProperty("sys.default.path.config", path);
+        System.setProperty("sys.default.path.images", path + "/images");
+        System.setProperty("sys.default.path.metadata", path + "/config/metadata/tabulation/");
+        
+        try {
+            scoring = new TabulationControllers(gRider, null).Scoring();
+            scoring.setVerifyEntryNo(false);
+            scoring.setContestId(contestId);
+            scoring.setJudgeName(judgeName);
+
+            JSONObject init = scoring.initTransaction();
+            if (!"success".equals(init.get("result"))) {
+                System.err.println("Init failed: " + init.get("message"));
+            }
+            JSONObject crit = scoring.loadCriteriaForJudging();
+            if (!"success".equals(crit.get("result"))) {
+                System.err.println("Criteria load failed: " + crit.get("message"));
+            }
+            JSONObject part = scoring.loadParticipants();
+            if (!"success".equals(part.get("result"))) {
+                System.err.println("Participants load failed: " + part.get("message"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
 
         TableColumn<Result, String> columnCandidates = new TableColumn<>("CANDIDATES");
         columnCandidates.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("candidates"));
@@ -65,19 +131,19 @@ public class FrmETabulationController implements Initializable {
         ResultTable.setEditable(true);
         
 
-        TableColumn<Result, Integer> columnSportswear = new TableColumn<>("SPORTSWEAR\n (15%)");
+        TableColumn<Result, Double> columnSportswear = new TableColumn<>("SPORTSWEAR\n (15%)");
         columnSportswear.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("sportswear"));
-        TableColumn<Result, Integer> columnFilipiniana = new TableColumn<>("FILIPINIANA\n (15%)");
+        TableColumn<Result, Double> columnFilipiniana = new TableColumn<>("FILIPINIANA\n (15%)");
         columnFilipiniana.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("filipiniana"));
-        TableColumn<Result, Integer> columnTalent = new TableColumn<>("TALENT\nPORTION\n (20%)");
+        TableColumn<Result, Double> columnTalent = new TableColumn<>("TALENT\nPORTION\n (20%)");
         columnTalent.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("talent"));
-        TableColumn<Result, Integer> columnPersonality = new TableColumn<>("PERSONALITY\n (25%)");
+        TableColumn<Result, Double> columnPersonality = new TableColumn<>("PERSONALITY\n (25%)");
         columnPersonality.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("personality"));
-        TableColumn<Result, Integer> columnBeauty = new TableColumn<>("BEAUTY\nOF FACE\n (25%)");
+        TableColumn<Result, Double> columnBeauty = new TableColumn<>("BEAUTY\nOF FACE\n (25%)");
         columnBeauty.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("beauty"));
-        TableColumn<Result, Integer> columnAudience = new TableColumn<>("AUDIENCE\nIMPACT\n (10%)");
+        TableColumn<Result, Double> columnAudience = new TableColumn<>("AUDIENCE\nIMPACT\n (10%)");
         columnAudience.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("audience"));
-        TableColumn<Result, Integer> columnTotal = new TableColumn<>("TOTAL\nSCORE");
+        TableColumn<Result, Double> columnTotal = new TableColumn<>("TOTAL\nSCORE");
 
         columnTotal.setCellValueFactory(cellData -> cellData.getValue().totalProperty().asObject());
         
@@ -107,12 +173,39 @@ public class FrmETabulationController implements Initializable {
             columnAudience, columnTotal
         );
         
-       
+  
         new Thread(() -> {
-            List<Result> results = service.fetchCandidateResults();
+            List<TableModelETabulation.Result> results = new ArrayList<>();
+            int count = scoring.getParticipantsCount();
+            for (int i = 0; i < count; i++) {
+                try {
+                    Model_Contest_Participants p = scoring.Participant(i);
+//                  
+                    
+                    //get participant name
+                    Model_Contest_Participants_Meta loMeta = scoring.ParticipantMeta(p.getGroupId(), "00002");
+                    String school = loMeta.getValue();
+                    
+                    //get participant school/town name
+                    loMeta = scoring.ParticipantMeta(p.getGroupId(), "00001");
+                    String name = loMeta.getValue();
+                    
+                    //get participant picture name
+                    loMeta = scoring.ParticipantMeta(p.getGroupId(), "00003");
+                    String img    = loMeta.getValue();
+                    img = System.getProperty("sys.default.path.images") + img.substring(45);
+                    
+                    
+                    results.add(new TableModelETabulation.Result(
+                        name, 0,0,0,0,0,0, 0, img, school
+                    ));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
             Platform.runLater(() -> {
-                ResultTable.getItems().clear();
-                ResultTable.getItems().addAll(results);
+                ResultTable.getItems().setAll(results);
+                
             });
         }).start();
         
@@ -184,6 +277,31 @@ public class FrmETabulationController implements Initializable {
             ETabulationUtils.createEditableCellFactory(25, 15, Color.web("#c7c7c7"))
         );
         
+        
+        ETabulationUtils.bindPercentageColumn(
+            ResultTable, columnSportswear,
+            TableModelETabulation.Result::setSportswear, ETabulationUtils.W_SW
+        );
+        ETabulationUtils.bindPercentageColumn(
+            ResultTable, columnFilipiniana,
+            TableModelETabulation.Result::setFilipiniana,ETabulationUtils.W_FL
+        );
+        ETabulationUtils.bindPercentageColumn(
+            ResultTable, columnTalent,
+            TableModelETabulation.Result::setTalent,ETabulationUtils.W_TA
+        );
+        ETabulationUtils.bindPercentageColumn(
+            ResultTable, columnPersonality,
+            TableModelETabulation.Result::setPersonality,ETabulationUtils.W_PE
+        );
+        ETabulationUtils.bindPercentageColumn(
+            ResultTable, columnBeauty,
+            TableModelETabulation.Result::setBeauty,ETabulationUtils.W_BE
+        );
+        ETabulationUtils.bindPercentageColumn(
+            ResultTable, columnAudience,
+            TableModelETabulation.Result::setAudience,ETabulationUtils.W_AU
+        );
 
         ResultTable.setRowFactory(tv -> {
             TableRow<Result> row = new TableRow<>();
@@ -196,18 +314,10 @@ public class FrmETabulationController implements Initializable {
             return row;
         });
 
-        
-//        ResultTable.getSelectionModel().selectedItemProperty().addListener((obs, oldS, newS) -> {
-//            if (newS != null) {
-//                imgCandidate.setImage(new Image(newS.getImageUrl()));
-//                txtAdInfo.setText(newS.getSchool());
-//                txtCandidName.setText(newS.getCandidates());
-//            }
-//        });
 
         ResultTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
-                // absolute path from your model, e.g. "D:\\GGC_Maven_Systems\\images\\alice.png"
+                
                 String fullPath = newSel.getImageUrl();
                 File imgFile = new File(fullPath);
 
@@ -219,13 +329,36 @@ public class FrmETabulationController implements Initializable {
                     // fallback placeholder
                     imgCandidate.setImage(new Image("D:\\GGC_Maven_Systems\\images\\alice.png"));
                 }
-
+                
+                
+                txtJudgeName.setText(judgeName);
                 txtCandidName.setText(newSel.getCandidates());
                 txtAdInfo.setText(newSel.getSchool());
+                
             }
         });
 
         
+        Platform.runLater(() -> {
+            Scene scene = Background.getScene();
+            scene.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+                if (evt.getCode() == KeyCode.ESCAPE) {
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Are you sure you want to exit?", 
+                        ButtonType.YES, ButtonType.NO);
+                    confirm.setTitle("Confirm Exit");
+                    confirm.setHeaderText(null);
+
+                    Optional<ButtonType> result = confirm.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.YES) {
+                        Stage stage = (Stage) scene.getWindow();
+                        stage.close();
+                    }
+                    evt.consume();
+                }
+            });
+        });
+
 
         Platform.runLater(() -> {
             for (Node node : ResultTable.lookupAll(".column-header .label")) {
@@ -235,5 +368,34 @@ public class FrmETabulationController implements Initializable {
                 }
             }
         });
+        
+        ResultTable.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+            if (evt.getCode() == KeyCode.TAB) {
+                TablePosition<?,?> pos = ResultTable.getFocusModel().getFocusedCell();
+                int row = pos.getRow();
+                int col = pos.getColumn();
+                int colCount = ResultTable.getVisibleLeafColumns().size();
+                int nextCol = (col + 1) % colCount;
+
+                // Skip first (index 0) and last (index colCount-1)
+                while (nextCol == 0 || nextCol == colCount - 1 || 
+                       !ResultTable.getVisibleLeafColumns().get(nextCol).isEditable()) {
+                    nextCol = (nextCol + 1) % colCount;
+                }
+
+                // Move focus & start edit on that cell
+                ResultTable.getFocusModel().focus(row, 
+                    (TableColumn<TableModelETabulation.Result, ?>)
+                    ResultTable.getVisibleLeafColumns().get(nextCol));
+                ResultTable.edit(row, 
+                    (TableColumn<TableModelETabulation.Result, ?>)
+                    ResultTable.getVisibleLeafColumns().get(nextCol));
+
+                evt.consume();
+            }
+        });
+        
+        ResultTable.getColumns().forEach(col -> col.setSortable(false));
+
     }
 }
