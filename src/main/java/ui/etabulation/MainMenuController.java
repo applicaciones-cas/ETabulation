@@ -51,10 +51,8 @@ public class MainMenuController implements Initializable {
         String lsFormMenu = mnuName.getId();
         switch (lsFormMenu) {
             case "mnuBingo":
-                openWindow("GuanzonBingo1920", "Guanzon E - Bingo", false);
-//                openWindow("GuanzonBingo1920Neo", "Guanzon E - Bingo");
-//                openWindow("GuanzonBingo1080", "Guanzon E - Bingo");
-//                openWindow("GuanzonBingo1080Neo", "Guanzon E - Bingo");
+//                openWindow("GuanzonBingo1920", "Guanzon E - Bingo", false);
+                openWindow("GuanzonBingo1080", "Guanzon E - Bingo",false);
                 break;
             case "mnuScoring":
                 openWindow("frmETabulation", "Scoring Module", true);
@@ -118,11 +116,11 @@ public class MainMenuController implements Initializable {
         GBingoController GBingoCtrl;
         switch (fsMenuForm) {
             case "GuanzonBingo1080":
-            case "GuanzonBingo1080Neo":
                 GBingoCtrl = new GBingoController();
                 GBingoCtrl.setScreenSize(1080);
+                
+                return GBingoCtrl;
             case "GuanzonBingo1920":
-            case "GuanzonBingo1920Neo":
                 GBingoCtrl = new GBingoController();
                 GBingoCtrl.setScreenSize(1920);
                 //todo incase

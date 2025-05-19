@@ -71,16 +71,16 @@ public class GBingoController implements Initializable {
         switch (lsButton) {
             case "btnBrowse":
             case "btnNew":
-                 if (ShowMessageFX.YesNo(null, "New Bingo", "Are you sure, do you want to New Transaction?") == false) {
-                 return;
-                 }
+                if (ShowMessageFX.YesNo(null, "New Bingo", "Are you sure, do you want to New Transaction?") == true) {
+                    initDrawLabel();
+                    initDrawGrid();
+                }
+                break;
             case "btnReset":
-                 if (ShowMessageFX.YesNo(null, "Reset Bingo", "Are you sure, do you want to Reset?") == false) {
-                 return;
-                 }
-                initDrawLabel();
-                initDrawGrid();
-
+                if (ShowMessageFX.YesNo(null, "Reset Bingo", "Are you sure, do you want to Reset?") == true) {
+                    initDrawLabel();
+                    initDrawGrid();
+                }
                 break;
         }
     }
@@ -104,11 +104,8 @@ public class GBingoController implements Initializable {
         for (int lnRow = 0; lnRow < bingoLetters.length; lnRow++) {
             try {
                 FXMLLoader fxLoader;
-                if (psScreenSize == 1920) {
-                    fxLoader = new FXMLLoader(getClass().getResource("/views/ModelBingoLetter1920.fxml"));
-                } else {
-                    fxLoader = new FXMLLoader(getClass().getResource("/views/ModelBingoLetter1080.fxml"));
-                }
+                fxLoader = new FXMLLoader(getClass().getResource("/views/ModelBingoLetter" + String.valueOf(psScreenSize) + ".fxml"));
+
                 AnchorPane modelPane = fxLoader.load();
                 ModelBingoLetterController loController = fxLoader.getController();
                 loController.setLetter(bingoLetters[lnRow]);
@@ -126,11 +123,8 @@ public class GBingoController implements Initializable {
             for (int lnCol = 1; lnCol <= lnBingoNumber; lnCol++) {
                 try {
                     FXMLLoader fxLoader;
-                    if (psScreenSize == 1920) {
-                        fxLoader = new FXMLLoader(getClass().getResource("/views/ModelBingoNo1920.fxml"));
-                    } else {
-                        fxLoader = new FXMLLoader(getClass().getResource("/views/ModelBingoNo1080.fxml"));
-                    }
+                    fxLoader = new FXMLLoader(getClass().getResource("/views/ModelBingoNo" + String.valueOf(psScreenSize) + ".fxml"));
+
                     AnchorPane modelPane = fxLoader.load();
                     ModelBingoNoController loController = fxLoader.getController();
 
@@ -184,19 +178,17 @@ public class GBingoController implements Initializable {
                         if (controller != null) {
                             controller.setNoVisible(true);
                             setDrawRecord(lnDrawNo);
-                            txtDrawnNo.setText("");
                         }
                     }
                 } catch (NumberFormatException ex) {
                     System.err.println("Invalid number entered: " + txtField.getText());
-                    txtField.setText("");
                 }
+                txtDrawnNo.setText("");
+                txtDrawnNo.requestFocus();
                 break;
             }
 
             event.consume();
-            CommonUtils.SetNextFocus(
-                    (TextField) event.getSource());
         } else if (event.getCode() == KeyCode.UP) {
             event.consume();
             CommonUtils.SetPreviousFocus((TextField) event.getSource());
