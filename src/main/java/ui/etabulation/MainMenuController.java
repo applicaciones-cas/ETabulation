@@ -2,6 +2,8 @@ package ui.etabulation;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 import javafx.animation.Animation;
@@ -15,11 +17,10 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
@@ -27,12 +28,17 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRider;
 
 public class MainMenuController implements Initializable {
 
     public static GRider oApp;
+    private final List<TranslateTransition> confettiAnimations = new ArrayList<>();
+    private boolean isConfettiRunning = false;
 
+    @FXML
+    AnchorPane apMain;
     @FXML
     private MenuItem mnuAbout, mnuScoring, mnuClose, mnuBingo;
     @FXML
@@ -41,7 +47,8 @@ public class MainMenuController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //to do list
-        Platform.runLater(() -> launchConfetti(pnMainCenter));
+        Platform.runLater(() -> restartConfetti(pnMainCenter));
+        Platform.runLater(() -> apMain.requestFocus());
 
     }
 
@@ -50,9 +57,11 @@ public class MainMenuController implements Initializable {
         MenuItem mnuName = (MenuItem) event.getSource();
         String lsFormMenu = mnuName.getId();
         switch (lsFormMenu) {
-            case "mnuBingo":
-//                openWindow("GuanzonBingo1920", "Guanzon E - Bingo", false);
-                openWindow("GuanzonBingo1080", "Guanzon E - Bingo",false);
+            case "mnuBingo1920":
+                openWindow("GuanzonBingo1920", "Guanzon E - Bingo", false);
+                break;
+            case "mnuBingo1080":
+                openWindow("GuanzonBingo1080", "Guanzon E - Bingo", false);
                 break;
             case "mnuScoring":
                 openWindow("frmETabulation", "Scoring Module", true);
@@ -71,6 +80,7 @@ public class MainMenuController implements Initializable {
     private void openWindow(String fsFormName, String fsTitle, boolean isMaximized) {
         try {
             Stage newScene = new Stage();
+            stopConfetti();
 
             FXMLLoader fxLoader = new FXMLLoader();
             Object fxObj = getUIController(fsFormName);
@@ -107,6 +117,8 @@ public class MainMenuController implements Initializable {
             newScene.initModality(Modality.APPLICATION_MODAL);
             newScene.centerOnScreen();
             newScene.showAndWait();
+
+            Platform.runLater(() -> restartConfetti(pnMainCenter));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,7 +130,7 @@ public class MainMenuController implements Initializable {
             case "GuanzonBingo1080":
                 GBingoCtrl = new GBingoController();
                 GBingoCtrl.setScreenSize(1080);
-                
+
                 return GBingoCtrl;
             case "GuanzonBingo1920":
                 GBingoCtrl = new GBingoController();
@@ -141,14 +153,18 @@ public class MainMenuController implements Initializable {
         oApp = poApp;
     }
 
-    public void launchConfetti(Pane root) {
-        Random random = new Random();
+    public void launchConfetti(Pane foPane) {
+        if (isConfettiRunning) {
+            return; // 
+        }
+        isConfettiRunning = true;
 
+        Random random = new Random();
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
         double screenHeight = bounds.getHeight();
-        int width = (int) (root.getWidth() > 0 ? root.getWidth() : 400);
-        int height = (int) (screenHeight);
+        int width = (int) (foPane.getWidth() > 0 ? foPane.getWidth() : 400);
+        int height = (int) screenHeight;
 
         for (int i = 0; i < 30; i++) {
             Circle confetti = new Circle(4);
@@ -162,9 +178,9 @@ public class MainMenuController implements Initializable {
             fall.setDelay(Duration.seconds(random.nextDouble() * 5));
             fall.play();
 
-            root.getChildren().add(confetti);
+            confettiAnimations.add(fall);
+            foPane.getChildren().add(confetti);
         }
-
     }
 
     private String randomColor() {
@@ -172,5 +188,32 @@ public class MainMenuController implements Initializable {
             "#facc15", "#00ffd0", "#ff4fd8", "#00bfff", "#ffbf00"
         };
         return neonColors[new Random().nextInt(neonColors.length)];
+    }
+
+    public void stopConfetti() {
+        for (TranslateTransition ttAnimate : confettiAnimations) {
+            ttAnimate.stop();
+        }
+        confettiAnimations.clear();
+        isConfettiRunning = false;
+    }
+
+    public void restartConfetti(Pane root) {
+        stopConfetti(); // cleanup old
+        launchConfetti(root); // restart
+    }
+
+    @FXML
+    private void MainAnchorPane_Keypress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            Platform.runLater(() -> {
+                stopConfetti(); 
+                if (ShowMessageFX.YesNo(null, "Exit", "Are you sure, do you want to close?")) {
+                    System.exit(0);
+                } else {
+                    restartConfetti(pnMainCenter);
+                }
+            });
+        }
     }
 }
