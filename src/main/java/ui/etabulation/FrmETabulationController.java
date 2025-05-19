@@ -1,8 +1,8 @@
 package ui.etabulation;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,12 +45,11 @@ import ph.com.guanzongroup.gtabulate.model.Model_Contest_Participants_Meta;
 import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
 import ui.etabulation.TableModelETabulation.Result;
 import ui.etabulation.ETabulationUtils; 
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
-import javafx.util.converter.DoubleStringConverter;
+import org.guanzon.appdriver.base.GuanzonException;
 
 public class FrmETabulationController extends Transaction implements Initializable{
-
+    
     @FXML private AnchorPane Background;
     @FXML private ScrollPane scrollPaneTable;
     @FXML private GridPane GridBox;
@@ -67,7 +66,8 @@ public class FrmETabulationController extends Transaction implements Initializab
     @FXML private Text txtJudgeName;
     
     static GRiderCAS gRider;
-    
+    public static FrmETabulationController tabcont;
+
     
     private Scoring scoring;
     private final String contestId = "00001";      
@@ -78,10 +78,8 @@ public class FrmETabulationController extends Transaction implements Initializab
     public void initialize(URL url, ResourceBundle rb) {
         
         
+        tabcont = this;
         
-        final double PERFECT = 70.0;
-        final double W_SW = 15, W_FL = 15, W_TA = 20, W_PE = 25, W_BE = 25, W_AU = 10;
-
         gRider = MiscUtil.Connect();
         
         String path;
@@ -180,13 +178,13 @@ public class FrmETabulationController extends Transaction implements Initializab
             for (int i = 0; i < count; i++) {
                 try {
                     Model_Contest_Participants p = scoring.Participant(i);
-//                  
                     
-                    //get participant name
+                    //get participant school/town name
                     Model_Contest_Participants_Meta loMeta = scoring.ParticipantMeta(p.getGroupId(), "00002");
                     String school = loMeta.getValue();
                     
-                    //get participant school/town name
+                    
+                    //get participant name
                     loMeta = scoring.ParticipantMeta(p.getGroupId(), "00001");
                     String name = loMeta.getValue();
                     
@@ -195,9 +193,23 @@ public class FrmETabulationController extends Transaction implements Initializab
                     String img    = loMeta.getValue();
                     img = System.getProperty("sys.default.path.images") + img.substring(45);
                     
-                    
+                    scoring.getMaster().setGroupId(p.getGroupId());
+                    scoring.getMaster().setComputerId(gRider.getTerminalNo());
+                    scoring.openTransaction(p.getGroupId(), gRider.getTerminalNo());
+//                    scoring.getDetail(1).getRate()
+                     System.out.println("Set score to: " + String.valueOf(scoring.getDetail(1).getRate()));
                     results.add(new TableModelETabulation.Result(
-                        name, 0,0,0,0,0,0, 0, img, school
+                        name, 
+                            scoring.getDetail(1).getRate(),
+                            scoring.getDetail(2).getRate(),
+                            scoring.getDetail(3).getRate(),
+                            scoring.getDetail(4).getRate(),
+                            scoring.getDetail(5).getRate(),
+                            scoring.getDetail(6).getRate(), 
+                            0, 
+                            img, 
+                            school, 
+                            p.getGroupId()
                     ));
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -339,6 +351,7 @@ public class FrmETabulationController extends Transaction implements Initializab
         });
 
         
+        
         Platform.runLater(() -> {
             Scene scene = Background.getScene();
             scene.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
@@ -377,13 +390,11 @@ public class FrmETabulationController extends Transaction implements Initializab
                 int colCount = ResultTable.getVisibleLeafColumns().size();
                 int nextCol = (col + 1) % colCount;
 
-                // Skip first (index 0) and last (index colCount-1)
                 while (nextCol == 0 || nextCol == colCount - 1 || 
                        !ResultTable.getVisibleLeafColumns().get(nextCol).isEditable()) {
                     nextCol = (nextCol + 1) % colCount;
                 }
 
-                // Move focus & start edit on that cell
                 ResultTable.getFocusModel().focus(row, 
                     (TableColumn<TableModelETabulation.Result, ?>)
                     ResultTable.getVisibleLeafColumns().get(nextCol));
@@ -398,4 +409,43 @@ public class FrmETabulationController extends Transaction implements Initializab
         ResultTable.getColumns().forEach(col -> col.setSortable(false));
 
     }
+    
+    
+    public JSONObject setRating(String recordId, String terminalNo, int detailIdx, double rate) {
+        JSONObject loJSON;
+        
+        
+        try {
+            loJSON = scoring.openTransaction(recordId, terminalNo);
+            if (!"success".equals((String) loJSON.get("result"))) {
+                System.err.println((String) loJSON.get("message"));
+                return loJSON;
+            } else {
+                System.err.println("Successfully set");
+            }
+
+            scoring.getDetail(detailIdx).setRate(rate);
+            System.out.println("Set score to: " + scoring.getDetail(detailIdx).getRate());
+            System.out.println("detail id: " + detailIdx);
+
+            loJSON = scoring.saveTransaction();
+            if (!"success".equals((String) loJSON.get("result"))) {
+                System.err.println((String) loJSON.get("message"));
+            }
+        } catch (CloneNotSupportedException | SQLException 
+                 | ExceptionInInitializerError | GuanzonException e) {
+            System.err.println(MiscUtil.getException(e));
+            loJSON = null;
+        }
+        return loJSON;
+    }
+
+    public static FrmETabulationController getController() {
+        return tabcont;
+    }
+    public String getTerminalNumber() {
+        return gRider.getTerminalNo();
+    }
+    
+    
 }
