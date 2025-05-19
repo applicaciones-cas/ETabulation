@@ -39,25 +39,31 @@
                               <Insets bottom="45.0" top="40.0" />
                            </VBox.margin>
                            <children>
-                              <VBox alignment="CENTER" prefHeight="260.0" prefWidth="220.0" style="-fx-background-color: #102E50; -fx-background-radius: 20;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <HBox spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label fx:id="lblDrawLetter" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="B" textAlignment="CENTER" textFill="WHITE" wrapText="true" VBox.vgrow="NEVER">
-                                       <font>
-                                          <Font name="System Bold" size="96.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets bottom="-10.0" left="-20.0" right="-20.0" top="-20.0" />
-                                       </padding>
-                                    </Label>
-                                    <Label fx:id="lblDrawNo" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" graphicTextGap="0.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="1" textAlignment="CENTER" textFill="WHITE" VBox.vgrow="NEVER">
-                                       <font>
-                                          <Font name="System Bold" size="130.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets bottom="-30.0" left="-20.0" right="-20.0" top="-40.0" />
-                                       </padding>
-                                    </Label>
-                                 </children></VBox>
+                                    <VBox alignment="CENTER" prefHeight="260.0" prefWidth="220.0" style="-fx-background-color: #102E50; -fx-background-radius: 20;">
+                                       <children>
+                                          <Label fx:id="lblDrawLetter" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="B" textAlignment="CENTER" textFill="WHITE" wrapText="true" VBox.vgrow="NEVER">
+                                             <font>
+                                                <Font name="System Bold" size="96.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="-10.0" left="-20.0" right="-20.0" top="-20.0" />
+                                             </padding>
+                                          </Label>
+                                          <Label fx:id="lblDrawNo" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" graphicTextGap="0.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="1" textAlignment="CENTER" textFill="WHITE" VBox.vgrow="NEVER">
+                                             <font>
+                                                <Font name="System Bold" size="130.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="-30.0" left="-20.0" right="-20.0" top="-40.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                    </VBox>
+                                    <ImageView fx:id="ivPattern" fitHeight="260.0" fitWidth="220.0" pickOnBounds="true" preserveRatio="true" />
+                                 </children>
+                              </HBox>
                            </children>
                         </AnchorPane>
                         <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">

@@ -12,6 +12,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -21,10 +24,13 @@ import javafx.stage.Stage;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
+import org.guanzon.appdriver.base.GRiderCAS;
+import ph.com.guanzongroup.gtabulate.Bingo;
+import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
 
 public class GBingoController implements Initializable {
 
-    public static GRider oApp;
+    public static GRiderCAS oApp;
     private final String pxeModuleName = "Guanzon E - BINGO";
 
     @FXML
@@ -43,14 +49,19 @@ public class GBingoController implements Initializable {
     private Label lblDrawNo;
     @FXML
     private TextField txtDrawnNo;
+    @FXML
+    private ImageView ivPattern;
 
     private final String[] bingoLetters = {"B", "I", "N", "G", "O"};
     private final ObservableList<ModelBingoNoController> CtrlBingoNo = FXCollections.observableArrayList();
     private int psScreenSize;
+    private Bingo oTrans;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //to do list
+        oTrans = new TabulationControllers(oApp, null).Bingo();
+        
         btnBrowse.setOnAction(this::cmdButton_Click);
         btnNew.setOnAction(this::cmdButton_Click);
         btnReset.setOnAction(this::cmdButton_Click);
@@ -58,6 +69,7 @@ public class GBingoController implements Initializable {
         txtDrawnNo.setOnKeyPressed(this::txtField_KeyPressed);
         initDrawLabel();
         initDrawGrid();
+        setPatternBingo();
     }
 
     public void setScreenSize(int screenSize) {
@@ -89,6 +101,13 @@ public class GBingoController implements Initializable {
         lblDrawLetter.setText("");
         lblDrawNo.setText("");
         txtDrawnNo.setText("");
+        txtDrawnNo.setTextFormatter(new TextFormatter<String>(foUpdate -> {
+            String newUpdate = foUpdate.getControlNewText();
+            if (newUpdate.matches("\\d{0,3}")) {
+                return foUpdate;
+            }
+            return null;
+        }));
 
     }
 
@@ -163,35 +182,34 @@ public class GBingoController implements Initializable {
     private void txtField_KeyPressed(KeyEvent event) {
         TextField txtField = (TextField) event.getSource();
         String lnTextNm = txtField.getId();
+        switch (event.getCode()) {
+            case TAB:
+            case ENTER:
+                    try {
+                int lnDrawNo = Integer.parseInt(txtField.getText());
 
-        if (event.getCode() == KeyCode.TAB
-                || event.getCode() == KeyCode.ENTER
-                || event.getCode() == KeyCode.F3) {
-            switch (lnTextNm) {
-
-                case "txtDrawnNo":
-                try {
-                    int lnDrawNo = Integer.parseInt(txtField.getText());
-
-                    if (lnDrawNo >= 1 && lnDrawNo <= 75) {
-                        ModelBingoNoController controller = getControllerByNumber(lnDrawNo);
-                        if (controller != null) {
-                            controller.setNoVisible(true);
-                            setDrawRecord(lnDrawNo);
-                        }
+                if (lnDrawNo >= 1 && lnDrawNo <= 75) {
+                    ModelBingoNoController controller = getControllerByNumber(lnDrawNo);
+                    if (controller != null) {
+                        controller.setNoVisible(true);
+                        setDrawRecord(lnDrawNo);
                     }
-                } catch (NumberFormatException ex) {
-                    System.err.println("Invalid number entered: " + txtField.getText());
                 }
-                txtDrawnNo.setText("");
-                txtDrawnNo.requestFocus();
-                break;
+            } catch (NumberFormatException ex) {
+                System.err.println("Invalid number entered: " + txtField.getText());
             }
+            txtDrawnNo.setText("");
+            txtDrawnNo.requestFocus();
 
             event.consume();
-        } else if (event.getCode() == KeyCode.UP) {
-            event.consume();
-            CommonUtils.SetPreviousFocus((TextField) event.getSource());
+            break;
+            case F3:
+                return;
+            case UP:
+                event.consume();
+                CommonUtils.SetPreviousFocus((TextField) event.getSource());
+                return;
+
         }
     }
 
@@ -208,6 +226,10 @@ public class GBingoController implements Initializable {
         lblDrawLetter.setText(lsDrawLetter);
         lblDrawNo.setText(String.valueOf(lnDrawNo));
 
+    }
+
+    private void setPatternBingo() {
+        ivPattern.setImage(new Image(getClass().getResourceAsStream("/images/BlackOut.png")));
     }
 
 }
