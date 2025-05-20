@@ -5,7 +5,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,9 +13,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
@@ -333,11 +329,11 @@ public class FrmETabulationController extends Transaction implements Initializab
     }
 
     private void initImages() {
-//        tableBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.5));
-//        imageBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.3));
+        tableBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.5));
+        imageBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.3));
         imageBox.setAlignment(Pos.CENTER);
-//        imgBanner.fitWidthProperty().bind(apMain.widthProperty());
-//        imgBanner.fitHeightProperty().bind(BannerBox.heightProperty());
+        imgBanner.fitWidthProperty().bind(apMain.widthProperty());
+        imgBanner.fitHeightProperty().bind(BannerBox.heightProperty());
         imgBanner.setPreserveRatio(false);
         CandidateBox.setVgrow(GridBox, Priority.ALWAYS);
         CandidateBox.setVgrow(JudgePane, Priority.ALWAYS);
@@ -347,8 +343,8 @@ public class FrmETabulationController extends Transaction implements Initializab
             ((Region) viewport).setClip(null);
         }
 
-//        imgCandidate.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.90));
-//        imgCandidate.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.90));
+        imgCandidate.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.90));
+        imgCandidate.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.90));
         imgCandidate.setPreserveRatio(false);
         imgCandidate.setSmooth(true);
         imgBanner.setImage(new Image("images/BannerSample.png"));
