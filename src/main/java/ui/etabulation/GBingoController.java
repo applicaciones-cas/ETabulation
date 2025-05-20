@@ -239,12 +239,16 @@ public class GBingoController implements Initializable {
                         System.err.println("Unable to load Pattern: " + loJSON.get("message"));
                     }
                     setPatternBingo();
+                    poJSON = oTrans.saveTransaction();
+                    if (!"success".equals((String) loJSON.get("result"))) {
+                        System.err.println((String) loJSON.get("message"));
+                    }
 
                     event.consume();
                     return;
 
             }
-        } catch (SQLException | GuanzonException ex) {
+        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(GBingoController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
