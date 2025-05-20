@@ -3,6 +3,7 @@ package ui.etabulation;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,15 +20,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
-import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.GRiderCAS;
 import ph.com.guanzongroup.gtabulate.Bingo;
 import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
-import static ui.etabulation.MainMenuController.oApp;
 
 public class GBingoController implements Initializable {
 
@@ -67,6 +65,10 @@ public class GBingoController implements Initializable {
         btnNew.setOnAction(this::cmdButton_Click);
         btnReset.setOnAction(this::cmdButton_Click);
 
+        Platform.runLater(() -> {
+            apMain.getScene().addEventFilter(KeyEvent.KEY_PRESSED,
+                     this::cmdForm_Keypress);
+        });
         txtDrawnNo.setOnKeyPressed(this::txtField_KeyPressed);
         initDrawLabel();
         initDrawGrid();
@@ -171,8 +173,7 @@ public class GBingoController implements Initializable {
         return CtrlBingoNo.get(lnCtrlNo - 1);
     }
 
-    @FXML
-    private void MainAnchorPane_Keypress(KeyEvent event) {
+    private void cmdForm_Keypress(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
             if (ShowMessageFX.YesNo(null, "Exit", "Are you sure, do you want to close?") == true) {
                 Stage stage = (Stage) apMain.getScene().getWindow();

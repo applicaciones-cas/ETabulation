@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,6 +35,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import org.guanzon.appdriver.agent.services.Transaction;
@@ -46,13 +49,13 @@ import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
 import ui.etabulation.TableModelETabulation.Result;
 import ui.etabulation.ETabulationUtils;
 import javafx.stage.Stage;
+import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GuanzonException;
-import static ui.etabulation.MainMenuController.oApp;
 
 public class FrmETabulationController extends Transaction implements Initializable {
 
     @FXML
-    private AnchorPane Background;
+    private AnchorPane apMain;
     @FXML
     private ScrollPane scrollPaneTable;
     @FXML
@@ -80,65 +83,138 @@ public class FrmETabulationController extends Transaction implements Initializab
     @FXML
     private Text txtJudgeName;
 
-    static GRiderCAS gRider;
+    static GRiderCAS oApp;
     public static FrmETabulationController tabcont;
 
-    private Scoring scoring;
-    private final String contestId = "00001";
-    private final String judgeName = "Waluigi";
+    private Scoring oTrans;
+    private String psContestID = "";
+    private String psJudgeName = "";
+    private JSONObject poJSON;
+    private TableColumn columnCandidates;
+    private TableColumn columnSportswear;
+    private TableColumn columnFilipiniana;
+    private TableColumn columnTalent;
+    private TableColumn columnPersonality;
+    private TableColumn columnBeauty;
+    private TableColumn columnAudience;
+    private TableColumn columnTotal;
+    private static List<TableModelETabulation.Result> poResults = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        tabcont = this;
+        //for testing
+        psContestID = "00001";
+        psJudgeName = "Waluigi";
         try {
-            scoring = new TabulationControllers(gRider, null).Scoring();
-            scoring.setVerifyEntryNo(false);
-            scoring.setContestId(contestId);
-            scoring.setJudgeName(judgeName);
+            tabcont = this;
+            oTrans = new TabulationControllers(oApp, null).Scoring();
+            oTrans.setContestId(psContestID);
+            oTrans.setJudgeName(psJudgeName);
 
-            JSONObject init = scoring.initTransaction();
-            if (!"success".equals(init.get("result"))) {
-                System.err.println("Init failed: " + init.get("message"));
+            poJSON = oTrans.initTransaction();
+            if (!"success".equals(poJSON.get("result"))) {
+                System.err.println("Init failed: " + poJSON.get("message"));
             }
-            JSONObject crit = scoring.loadCriteriaForJudging();
-            if (!"success".equals(crit.get("result"))) {
-                System.err.println("Criteria load failed: " + crit.get("message"));
+
+            poJSON = initRecord();
+            if (!"success".equals(poJSON.get("result"))) {
+                System.err.println("Init failed: " + poJSON.get("message"));
             }
-            JSONObject part = scoring.loadParticipants();
-            if (!"success".equals(part.get("result"))) {
-                System.err.println("Participants load failed: " + part.get("message"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            initRecord();
+            initTable();
+            initTableSetter();
+            initImages();
+            initListener();
+
+            new Thread(() -> {
+                loadResult();
+            }).start();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(FrmETabulationController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(FrmETabulationController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(FrmETabulationController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        TableColumn<Result, String> columnCandidates = new TableColumn<>("CANDIDATES");
-        columnCandidates.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("candidates"));
+    }
 
-        columnCandidates.setCellFactory(tc -> new TableCell<Result, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                setText((empty || item == null) ? null : (getIndex() + 1) + ". " + item);
+    public void setJudgeName(String fsJudgeName) {
+        psJudgeName = fsJudgeName;
+    }
+
+    public void setContestID(String fsContestID) {
+        psContestID = fsContestID;
+    }
+
+    private void cmdForm_Keypress(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            if (ShowMessageFX.YesNo(null, "Exit", "Are you sure, do you want to close?") == true) {
+                Stage stage = (Stage) apMain.getScene().getWindow();
+
+                oApp = null;
+                stage.close();
             }
-        });
+        }
+    }
 
-        ResultTable.setEditable(true);
+    private void cmdTable_Keypress(KeyEvent event) {
 
+        if (event.getCode() == KeyCode.TAB) {
+            TablePosition<?, ?> pos = ResultTable.getFocusModel().getFocusedCell();
+            int row = pos.getRow();
+            int col = pos.getColumn();
+            int colCount = ResultTable.getVisibleLeafColumns().size();
+            int nextCol = (col + 1) % colCount;
+
+            while (nextCol == 0 || nextCol == colCount - 1
+                    || !ResultTable.getVisibleLeafColumns().get(nextCol).isEditable()) {
+                nextCol = (nextCol + 1) % colCount;
+            }
+
+            ResultTable.getFocusModel().focus(row,
+                    (TableColumn<TableModelETabulation.Result, ?>) ResultTable.getVisibleLeafColumns().get(nextCol));
+            ResultTable.edit(row,
+                    (TableColumn<TableModelETabulation.Result, ?>) ResultTable.getVisibleLeafColumns().get(nextCol));
+
+            event.consume();
+        }
+
+    }
+
+    private JSONObject initRecord() throws SQLException, GuanzonException, CloneNotSupportedException {
+        JSONObject loJSON;
+
+        loJSON = oTrans.loadCriteriaForJudging();
+        if (!"success".equals(loJSON.get("result"))) {
+            System.err.println("Criteria load failed: " + loJSON.get("message"));
+        }
+        loJSON = oTrans.loadParticipants();
+        if (!"success".equals(loJSON.get("result"))) {
+            System.err.println("Participants load failed: " + loJSON.get("message"));
+        }
+        return loJSON;
+    }
+
+    private void initTable() {
+        TableColumn<Result, String> columnCandidates = new TableColumn<>("CANDIDATES");
         TableColumn<Result, Double> columnSportswear = new TableColumn<>("SPORTSWEAR\n (15%)");
-        columnSportswear.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("sportswear"));
         TableColumn<Result, Double> columnFilipiniana = new TableColumn<>("FILIPINIANA\n (15%)");
-        columnFilipiniana.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("filipiniana"));
         TableColumn<Result, Double> columnTalent = new TableColumn<>("TALENT\nPORTION\n (20%)");
-        columnTalent.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("talent"));
         TableColumn<Result, Double> columnPersonality = new TableColumn<>("PERSONALITY\n (25%)");
-        columnPersonality.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("personality"));
         TableColumn<Result, Double> columnBeauty = new TableColumn<>("BEAUTY\nOF FACE\n (25%)");
-        columnBeauty.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("beauty"));
         TableColumn<Result, Double> columnAudience = new TableColumn<>("AUDIENCE\nIMPACT\n (10%)");
-        columnAudience.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("audience"));
         TableColumn<Result, Double> columnTotal = new TableColumn<>("TOTAL\nSCORE");
+
+        columnSportswear.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("sportswear"));
+        columnFilipiniana.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("filipiniana"));
+        columnTalent.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("talent"));
+        columnPersonality.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("personality"));
+        columnBeauty.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("beauty"));
+        columnAudience.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("audience"));
 
         columnTotal.setCellValueFactory(cellData -> cellData.getValue().totalProperty().asObject());
 
@@ -165,55 +241,13 @@ public class FrmETabulationController extends Transaction implements Initializab
                 columnTalent, columnPersonality, columnBeauty,
                 columnAudience, columnTotal
         );
+        ResultTable.setEditable(true);
 
-        new Thread(() -> {
-            List<TableModelETabulation.Result> results = new ArrayList<>();
-            int count = scoring.getParticipantsCount();
-            for (int i = 0; i < count; i++) {
-                try {
-                    Model_Contest_Participants p = scoring.Participant(i);
+        ResultTable.getColumns().forEach(col -> col.setSortable(false));
 
-                    //get participant school/town name
-                    Model_Contest_Participants_Meta loMeta = scoring.ParticipantMeta(p.getGroupId(), "00002");
-                    String school = loMeta.getValue();
+    }
 
-                    //get participant name
-                    loMeta = scoring.ParticipantMeta(p.getGroupId(), "00001");
-                    String name = loMeta.getValue();
-
-                    //get participant picture name
-                    loMeta = scoring.ParticipantMeta(p.getGroupId(), "00003");
-                    String img = loMeta.getValue();
-                    img = System.getProperty("sys.default.path.images") + img.substring(45);
-
-                    scoring.getMaster().setGroupId(p.getGroupId());
-                    scoring.getMaster().setComputerId(gRider.getTerminalNo());
-                    scoring.openTransaction(p.getGroupId(), gRider.getTerminalNo());
-//                    scoring.getDetail(1).getRate()
-                    System.out.println("Set score to: " + String.valueOf(scoring.getDetail(1).getRate()));
-                    results.add(new TableModelETabulation.Result(
-                            name,
-                            scoring.getDetail(1).getRate(),
-                            scoring.getDetail(2).getRate(),
-                            scoring.getDetail(3).getRate(),
-                            scoring.getDetail(4).getRate(),
-                            scoring.getDetail(5).getRate(),
-                            scoring.getDetail(6).getRate(),
-                            0,
-                            img,
-                            school,
-                            p.getGroupId()
-                    ));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            Platform.runLater(() -> {
-                ResultTable.getItems().setAll(results);
-
-            });
-        }).start();
-
+    private void initTableSetter() {
         ResultTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         ResultTable.widthProperty().addListener((obs, oldW, newW) -> {
             double width = newW.doubleValue();
@@ -226,33 +260,13 @@ public class FrmETabulationController extends Transaction implements Initializab
             columnAudience.setPrefWidth(width * 0.1);
             columnTotal.setPrefWidth(width * 0.09);
         });
-
-        imgBanner.fitWidthProperty().bind(Background.widthProperty());
-        tableBox.prefWidthProperty().bind(Background.widthProperty().multiply(0.5));
-        imageBox.prefWidthProperty().bind(Background.widthProperty().multiply(0.3));
-        imageBox.setAlignment(Pos.CENTER);
-        imgBanner.fitHeightProperty().bind(BannerBox.heightProperty());
-        imgBanner.setPreserveRatio(false);
-        VBox.setVgrow(GridBox, Priority.ALWAYS);
-        VBox.setVgrow(JudgePane, Priority.ALWAYS);
-
-        Node viewport = scrollPaneTable.lookup(".viewport");
-        if (viewport instanceof Region) {
-            ((Region) viewport).setClip(null);
-        }
-
-        imgCandidate.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.90));
-        imgCandidate.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.90));
-        imgCandidate.setPreserveRatio(false);
-        imgCandidate.setSmooth(true);
-        imgBanner.setImage(new Image("images/BannerSample.png"));
-        imgCandidate.layoutBoundsProperty().addListener((obs, oldB, newB) -> {
-            javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle();
-            clip.setWidth(newB.getWidth());
-            clip.setHeight(newB.getHeight());
-            clip.setArcWidth(60);
-            clip.setArcHeight(60);
-            imgCandidate.setClip(clip);
+        columnCandidates.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("candidates"));
+        columnCandidates.setCellFactory(tc -> new TableCell<Result, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText((empty || item == null) ? null : (getIndex() + 1) + ". " + item);
+            }
         });
 
         columnSportswear.setCellFactory(
@@ -303,6 +317,7 @@ public class FrmETabulationController extends Transaction implements Initializab
                 TableModelETabulation.Result::setAudience, ETabulationUtils.W_AU
         );
 
+        //listener for table
         ResultTable.setRowFactory(tv -> {
             TableRow<Result> row = new TableRow<>();
             row.selectedProperty().addListener((obs, oldSel, newSel) -> {
@@ -313,6 +328,42 @@ public class FrmETabulationController extends Transaction implements Initializab
             });
             return row;
         });
+
+    }
+
+    private void initImages() {
+
+        tableBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.5));
+        imgBanner.fitWidthProperty().bind(apMain.widthProperty());
+        imageBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.3));
+        imageBox.setAlignment(Pos.CENTER);
+        imgBanner.fitHeightProperty().bind(BannerBox.heightProperty());
+        imgBanner.setPreserveRatio(false);
+        VBox.setVgrow(GridBox, Priority.ALWAYS);
+        VBox.setVgrow(JudgePane, Priority.ALWAYS);
+
+        Node viewport = scrollPaneTable.lookup(".viewport");
+        if (viewport instanceof Region) {
+            ((Region) viewport).setClip(null);
+        }
+
+        imgCandidate.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.90));
+        imgCandidate.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.90));
+        imgCandidate.setPreserveRatio(false);
+        imgCandidate.setSmooth(true);
+        imgBanner.setImage(new Image("images/BannerSample.png"));
+        imgCandidate.layoutBoundsProperty().addListener((obs, oldB, newB) -> {
+            Rectangle clip = new javafx.scene.shape.Rectangle();
+            clip.setWidth(newB.getWidth());
+            clip.setHeight(newB.getHeight());
+            clip.setArcWidth(60);
+            clip.setArcHeight(60);
+            imgCandidate.setClip(clip);
+        });
+
+    }
+
+    private void initListener() {
 
         ResultTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
@@ -328,8 +379,7 @@ public class FrmETabulationController extends Transaction implements Initializab
                     // fallback placeholder
                     imgCandidate.setImage(new Image("D:\\GGC_Maven_Systems\\images\\alice.png"));
                 }
-
-                txtJudgeName.setText(judgeName);
+                txtJudgeName.setText(psJudgeName);
                 txtCandidName.setText(newSel.getCandidates());
                 txtAdInfo.setText(newSel.getSchool());
 
@@ -337,23 +387,13 @@ public class FrmETabulationController extends Transaction implements Initializab
         });
 
         Platform.runLater(() -> {
-            Scene scene = Background.getScene();
-            scene.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-                if (evt.getCode() == KeyCode.ESCAPE) {
-                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                            "Are you sure you want to exit?",
-                            ButtonType.YES, ButtonType.NO);
-                    confirm.setTitle("Confirm Exit");
-                    confirm.setHeaderText(null);
+            apMain.getScene().addEventFilter(KeyEvent.KEY_PRESSED,
+                    this::cmdForm_Keypress);
+        });
 
-                    Optional<ButtonType> result = confirm.showAndWait();
-                    if (result.isPresent() && result.get() == ButtonType.YES) {
-                        Stage stage = (Stage) scene.getWindow();
-                        stage.close();
-                    }
-                    evt.consume();
-                }
-            });
+        Platform.runLater(() -> {
+            ResultTable.addEventFilter(KeyEvent.KEY_PRESSED,
+                    this::cmdTable_Keypress);
         });
 
         Platform.runLater(() -> {
@@ -364,30 +404,54 @@ public class FrmETabulationController extends Transaction implements Initializab
                 }
             }
         });
+    }
 
-        ResultTable.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
-            if (evt.getCode() == KeyCode.TAB) {
-                TablePosition<?, ?> pos = ResultTable.getFocusModel().getFocusedCell();
-                int row = pos.getRow();
-                int col = pos.getColumn();
-                int colCount = ResultTable.getVisibleLeafColumns().size();
-                int nextCol = (col + 1) % colCount;
+    private void loadResult() {
+        poResults = new ArrayList<>();
+        int count = oTrans.getParticipantsCount();
+        for (int i = 0; i < count; i++) {
+            try {
+                Model_Contest_Participants p = oTrans.Participant(i);
 
-                while (nextCol == 0 || nextCol == colCount - 1
-                        || !ResultTable.getVisibleLeafColumns().get(nextCol).isEditable()) {
-                    nextCol = (nextCol + 1) % colCount;
-                }
+                //get participant school/town name
+                Model_Contest_Participants_Meta loMeta = oTrans.ParticipantMeta(p.getGroupId(), "00002");
+                String school = loMeta.getValue();
 
-                ResultTable.getFocusModel().focus(row,
-                        (TableColumn<TableModelETabulation.Result, ?>) ResultTable.getVisibleLeafColumns().get(nextCol));
-                ResultTable.edit(row,
-                        (TableColumn<TableModelETabulation.Result, ?>) ResultTable.getVisibleLeafColumns().get(nextCol));
+                //get participant name
+                loMeta = oTrans.ParticipantMeta(p.getGroupId(), "00001");
+                String name = loMeta.getValue();
 
-                evt.consume();
+                //get participant picture name
+                loMeta = oTrans.ParticipantMeta(p.getGroupId(), "00003");
+                String img = loMeta.getValue();
+                img = System.getProperty("sys.default.path.images") + img.substring(45);
+
+                oTrans.getMaster().setGroupId(p.getGroupId());
+                oTrans.getMaster().setComputerId(oApp.getTerminalNo());
+                oTrans.openTransaction(p.getGroupId(), oApp.getTerminalNo());
+//                    oTrans.getDetail(1).getRate()
+                System.out.println("Set score to: " + String.valueOf(oTrans.getDetail(1).getRate()));
+                poResults.add(new TableModelETabulation.Result(
+                        name,
+                        oTrans.getDetail(1).getRate(),
+                        oTrans.getDetail(2).getRate(),
+                        oTrans.getDetail(3).getRate(),
+                        oTrans.getDetail(4).getRate(),
+                        oTrans.getDetail(5).getRate(),
+                        oTrans.getDetail(6).getRate(),
+                        0,
+                        img,
+                        school,
+                        p.getGroupId()
+                ));
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        });
+        }
+        Platform.runLater(() -> {
+            ResultTable.getItems().setAll(poResults);
 
-        ResultTable.getColumns().forEach(col -> col.setSortable(false));
+        });
 
     }
 
@@ -395,19 +459,19 @@ public class FrmETabulationController extends Transaction implements Initializab
         JSONObject loJSON;
 
         try {
-            loJSON = scoring.openTransaction(recordId, terminalNo);
+            loJSON = oTrans.openTransaction(recordId, terminalNo);
             if (!"success".equals((String) loJSON.get("result"))) {
                 System.err.println((String) loJSON.get("message"));
                 return loJSON;
             } else {
-                System.err.println("Successfully set");
+                System.out.println("Successfully set");
             }
 
-            scoring.getDetail(detailIdx).setRate(rate);
-            System.out.println("Set score to: " + scoring.getDetail(detailIdx).getRate());
+            oTrans.getDetail(detailIdx).setRate(rate);
+            System.out.println("Set score to: " + oTrans.getDetail(detailIdx).getRate());
             System.out.println("detail id: " + detailIdx);
 
-            loJSON = scoring.saveTransaction();
+            loJSON = oTrans.saveTransaction();
             if (!"success".equals((String) loJSON.get("result"))) {
                 System.err.println((String) loJSON.get("message"));
             }
@@ -424,7 +488,7 @@ public class FrmETabulationController extends Transaction implements Initializab
     }
 
     public String getTerminalNumber() {
-        return gRider.getTerminalNo();
+        return oApp.getTerminalNo();
     }
 
     public void setGRider(GRiderCAS poApp) {

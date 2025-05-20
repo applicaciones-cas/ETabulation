@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="apMain" onKeyPressed="#MainAnchorPane_Keypress" prefHeight="700.0" prefWidth="1920.0" style="-fx-background-color: linear-gradient(to bottom right, #ffffff, #ffeaff, #e0fff4, #fffbcf, #e5e0ff); -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="apMain" prefHeight="700.0" prefWidth="1920.0" style="-fx-background-color: linear-gradient(to bottom right, #ffffff, #ffeaff, #e0fff4, #fffbcf, #e5e0ff); -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="45.0">
          <left>

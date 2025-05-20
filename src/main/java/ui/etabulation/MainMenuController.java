@@ -50,6 +50,10 @@ public class MainMenuController implements Initializable {
         //to do list
         Platform.runLater(() -> restartConfetti(pnMainCenter));
         Platform.runLater(() -> apMain.requestFocus());
+        Platform.runLater(() -> {
+            apMain.getScene().addEventFilter(KeyEvent.KEY_PRESSED,
+                    this::cmdForm_Keypress);
+        });
 
     }
 
@@ -207,11 +211,10 @@ public class MainMenuController implements Initializable {
         launchConfetti(root); // restart
     }
 
-    @FXML
-    private void MainAnchorPane_Keypress(KeyEvent event) {
+    private void cmdForm_Keypress(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
             Platform.runLater(() -> {
-                stopConfetti(); 
+                stopConfetti();
                 if (ShowMessageFX.YesNo(null, "Exit", "Are you sure, do you want to close?")) {
                     System.exit(0);
                 } else {

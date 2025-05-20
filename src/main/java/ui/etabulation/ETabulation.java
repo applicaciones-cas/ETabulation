@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.MiscUtil;
 
