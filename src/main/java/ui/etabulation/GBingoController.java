@@ -21,7 +21,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import static javafx.scene.input.KeyCode.ESCAPE;
 import static javafx.scene.input.KeyCode.F3;
 import javafx.scene.input.KeyEvent;
@@ -59,7 +58,7 @@ public class GBingoController implements Initializable {
     private ImageView ivPattern;
 
     public static GRiderCAS oApp;
-    private final String pxeModuleName = "Guanzon E - BINGO";
+    private final String pxeModuleName = "Guanzon BINGO";
     private final String[] bingoLetters = {"B", "I", "N", "G", "O"};
     private final ObservableList<ModelBingoNoController> CtrlBingoNo = FXCollections.observableArrayList();
     private int psScreenSize;
@@ -117,7 +116,7 @@ public class GBingoController implements Initializable {
         try {
             switch (lsButton) {
                 case "btnBrowse":
-                    if (ShowMessageFX.YesNo(null, "Load Bingo", "Are you sure, do you want to Load Transaction?") == true) {
+                    if (ShowMessageFX.YesNo(null, "Load Bingo", "Load Transaction?") == true) {
                         initDrawLabel();
                         initDrawGrid();
                         poTransaction = "";
@@ -132,7 +131,7 @@ public class GBingoController implements Initializable {
                     }
                     break;
                 case "btnNew":
-                    if (ShowMessageFX.YesNo(null, "New Bingo", "Are you sure, do you want to New Transaction?") == true) {
+                    if (ShowMessageFX.YesNo(null, "New Bingo", "Create new transaction?") == true) {
 
                         initDrawLabel();
                         initDrawGrid();
@@ -143,7 +142,7 @@ public class GBingoController implements Initializable {
                     }
                     break;
                 case "btnReset":
-                    if (ShowMessageFX.YesNo(null, "Reset Bingo", "Are you sure, do you want to Reset?") == true) {
+                    if (ShowMessageFX.YesNo(null, "Reset Bingo", "Reset transaction?") == true) {
                         initDrawLabel();
                         initDrawGrid();
                         getTransaction();
@@ -234,7 +233,7 @@ public class GBingoController implements Initializable {
             JSONObject loJSON;
             switch (event.getCode()) {
                 case ESCAPE:
-                    if (ShowMessageFX.YesNo(null, "Exit", "Are you sure, do you want to close?") == true) {
+                    if (ShowMessageFX.YesNo(null, "Exit", "Close program?") == true) {
                         Stage stage = (Stage) apMain.getScene().getWindow();
 
                         oApp = null;
@@ -252,10 +251,7 @@ public class GBingoController implements Initializable {
                     }
                     setPatternBingo();
                     saveTransaction();
-
                     event.consume();
-                    return;
-
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(GBingoController.class.getName()).log(Level.SEVERE, null, ex);
@@ -268,36 +264,42 @@ public class GBingoController implements Initializable {
         switch (event.getCode()) {
             case TAB:
             case ENTER:
-                    try {
-                int lnDrawNo = Integer.parseInt(txtField.getText());
+                try {
+                    if (oTrans.getMaster().getPatternId().isEmpty()) {
+                        ShowMessageFX.Warning(null, "Exit", "No pattern selected.");
+                        txtDrawnNo.setText("");
+                        txtDrawnNo.requestFocus();
+                        return;
+                    }
+                    
+                    int lnDrawNo = Integer.parseInt(txtField.getText());
 
-                if (lnDrawNo >= 1 && lnDrawNo <= 75) {
-                    ModelBingoNoController getBingoCtrl = getControllerByNumber(lnDrawNo);
-                    if (getBingoCtrl != null) {
-                        if (!getBingoCtrl.getNoVisible()) {
-                            getBingoCtrl.setNoVisible(true);
-                            JSONObject loJSON;
-                            getTransaction();
+                    if (lnDrawNo >= 1 && lnDrawNo <= 75) {
+                        ModelBingoNoController getBingoCtrl = getControllerByNumber(lnDrawNo);
+                        if (getBingoCtrl != null) {
+                            if (!getBingoCtrl.getNoVisible()) {
+                                getBingoCtrl.setNoVisible(true);
+                                JSONObject loJSON;
+                                getTransaction();
 
-                            oTrans.getDetail(oTrans.getDetailCount()).setBingoNo(lnDrawNo);
-                            setDrawRecord(oTrans.getDetail(oTrans.getDetailCount() - 1).getBingoNo());
-                            saveTransaction();
+                                oTrans.getDetail(oTrans.getDetailCount()).setBingoNo(lnDrawNo);
+                                setDrawRecord(oTrans.getDetail(oTrans.getDetailCount() - 1).getBingoNo());
+                                saveTransaction();
+                            }
                         }
                     }
+                } catch (NumberFormatException ex) {
+                    System.err.println("Invalid number entered: " + txtField.getText());
+
+                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                    Logger.getLogger(GBingoController.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
-            } catch (NumberFormatException ex) {
-                System.err.println("Invalid number entered: " + txtField.getText());
+                txtDrawnNo.setText("");
+                txtDrawnNo.requestFocus();
 
-            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(GBingoController.class
-                        .getName()).log(Level.SEVERE, null, ex);
-            }
-            txtDrawnNo.setText("");
-            txtDrawnNo.requestFocus();
-
-            event.consume();
-            break;
-
+                event.consume();
+                break;
             case UP:
                 event.consume();
                 CommonUtils.SetPreviousFocus((TextField) event.getSource());

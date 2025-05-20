@@ -10,15 +10,18 @@ import javafx.animation.Animation;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
@@ -32,7 +35,6 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRiderCAS;
 
 public class MainMenuController implements Initializable {
-
     public static GRiderCAS oApp;
     private final List<TranslateTransition> confettiAnimations = new ArrayList<>();
     private boolean isConfettiRunning = false;
@@ -40,9 +42,12 @@ public class MainMenuController implements Initializable {
     @FXML
     AnchorPane apMain;
     @FXML
-    private MenuItem mnuAbout, mnuScoring, mnuClose, mnuBingo;
+    private MenuItem mnuAbout, mnuScoring, mnuClose, mnuBingo, mnuMinimize;
     @FXML
     private Pane pnMainCenter;
+    
+    double xOffset = 0; 
+    double yOffset = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -62,16 +67,21 @@ public class MainMenuController implements Initializable {
         String lsFormMenu = mnuName.getId();
         switch (lsFormMenu) {
             case "mnuBingo1920":
-                openWindow("GuanzonBingo1920", "Guanzon E - Bingo", false);
+                getStage().setIconified(true);
+                openWindow("GuanzonBingo1920", "Guanzon Bingo", false);
                 break;
             case "mnuBingo1080":
-                openWindow("GuanzonBingo1080", "Guanzon E - Bingo", false);
+                getStage().setIconified(true);
+                openWindow("GuanzonBingo1080", "Guanzon Bingo", false);
                 break;
             case "mnuScoring":
-                openWindow("frmETabulation", "Scoring Module", true);
+                openWindow("frmETabulation", "Tabulation", true);
                 break;
             case "mnuAbout":
                 openWindow("About", "About This App", false);
+                break;
+            case "mnuMinimize":
+                getStage().setIconified(true);
                 break;
             case "mnuClose":
                 Platform.exit();
@@ -79,6 +89,10 @@ public class MainMenuController implements Initializable {
             default:
                 System.err.println("Unhandled menu: " + lsFormMenu);
         }
+    }
+    
+    private Stage getStage(){
+        return (Stage) apMain.getScene().getWindow();
     }
 
     private void openWindow(String fsFormName, String fsTitle, boolean isMaximized) {
@@ -102,6 +116,23 @@ public class MainMenuController implements Initializable {
             fxLoader.setController(fxObj);
 
             Parent foParent = fxLoader.load();
+            
+            
+            foParent.setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    xOffset = event.getSceneX();
+                    yOffset = event.getSceneY();
+                }
+            });
+            
+            foParent.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    newScene.setX(event.getScreenX() - xOffset);
+                    newScene.setY(event.getScreenY() - yOffset);
+                }
+            });
 
             if (isMaximized) {
                 //get the screen size
@@ -114,6 +145,7 @@ public class MainMenuController implements Initializable {
                 newScene.setWidth(bounds.getWidth());
                 newScene.setHeight(bounds.getHeight());
             }
+            
             Scene childScene = new Scene(foParent);
             newScene.setTitle(fsTitle);
             newScene.setScene(childScene);
