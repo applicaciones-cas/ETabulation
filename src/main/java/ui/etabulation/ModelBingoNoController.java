@@ -36,6 +36,10 @@ public class ModelBingoNoController implements Initializable {
     public void setNoVisible(boolean fbVisible) {
         lblBingoNo.setVisible(fbVisible);
     }
+    
+    public boolean getNoVisible() {
+        return lblBingoNo.isVisible();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {

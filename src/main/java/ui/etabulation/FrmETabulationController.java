@@ -90,14 +90,15 @@ public class FrmETabulationController extends Transaction implements Initializab
     private String psContestID = "";
     private String psJudgeName = "";
     private JSONObject poJSON;
-    private TableColumn columnCandidates;
-    private TableColumn columnSportswear;
-    private TableColumn columnFilipiniana;
-    private TableColumn columnTalent;
-    private TableColumn columnPersonality;
-    private TableColumn columnBeauty;
-    private TableColumn columnAudience;
-    private TableColumn columnTotal;
+    private TableColumn<Result, String> columnCandidates;
+    private TableColumn<Result, Double> columnSportswear;
+    private TableColumn<Result, Double> columnFilipiniana;
+    private TableColumn<Result, Double> columnTalent;
+    private TableColumn<Result, Double> columnPersonality;
+    private TableColumn<Result, Double> columnBeauty;
+    private TableColumn<Result, Double> columnAudience;
+    private TableColumn<Result, Double> columnTotal;
+
     private static List<TableModelETabulation.Result> poResults = new ArrayList<>();
 
     @Override
@@ -200,15 +201,16 @@ public class FrmETabulationController extends Transaction implements Initializab
     }
 
     private void initTable() {
-        TableColumn<Result, String> columnCandidates = new TableColumn<>("CANDIDATES");
-        TableColumn<Result, Double> columnSportswear = new TableColumn<>("SPORTSWEAR\n (15%)");
-        TableColumn<Result, Double> columnFilipiniana = new TableColumn<>("FILIPINIANA\n (15%)");
-        TableColumn<Result, Double> columnTalent = new TableColumn<>("TALENT\nPORTION\n (20%)");
-        TableColumn<Result, Double> columnPersonality = new TableColumn<>("PERSONALITY\n (25%)");
-        TableColumn<Result, Double> columnBeauty = new TableColumn<>("BEAUTY\nOF FACE\n (25%)");
-        TableColumn<Result, Double> columnAudience = new TableColumn<>("AUDIENCE\nIMPACT\n (10%)");
-        TableColumn<Result, Double> columnTotal = new TableColumn<>("TOTAL\nSCORE");
+        columnCandidates = new TableColumn<>("CANDIDATES");
+        columnSportswear = new TableColumn<>("SPORTSWEAR\n (15%)");
+        columnFilipiniana = new TableColumn<>("FILIPINIANA\n (15%)");
+        columnTalent = new TableColumn<>("TALENT\nPORTION\n (20%)");
+        columnPersonality = new TableColumn<>("PERSONALITY\n (25%)");
+        columnBeauty = new TableColumn<>("BEAUTY\nOF FACE\n (25%)");
+        columnAudience = new TableColumn<>("AUDIENCE\nIMPACT\n (10%)");
+        columnTotal = new TableColumn<>("TOTAL\nSCORE");
 
+        columnCandidates.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("candidates"));
         columnSportswear.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("sportswear"));
         columnFilipiniana.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("filipiniana"));
         columnTalent.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("talent"));
@@ -260,7 +262,6 @@ public class FrmETabulationController extends Transaction implements Initializab
             columnAudience.setPrefWidth(width * 0.1);
             columnTotal.setPrefWidth(width * 0.09);
         });
-        columnCandidates.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("candidates"));
         columnCandidates.setCellFactory(tc -> new TableCell<Result, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -332,23 +333,22 @@ public class FrmETabulationController extends Transaction implements Initializab
     }
 
     private void initImages() {
-
-        tableBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.5));
-        imgBanner.fitWidthProperty().bind(apMain.widthProperty());
-        imageBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.3));
+//        tableBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.5));
+//        imageBox.prefWidthProperty().bind(apMain.widthProperty().multiply(0.3));
         imageBox.setAlignment(Pos.CENTER);
-        imgBanner.fitHeightProperty().bind(BannerBox.heightProperty());
+//        imgBanner.fitWidthProperty().bind(apMain.widthProperty());
+//        imgBanner.fitHeightProperty().bind(BannerBox.heightProperty());
         imgBanner.setPreserveRatio(false);
-        VBox.setVgrow(GridBox, Priority.ALWAYS);
-        VBox.setVgrow(JudgePane, Priority.ALWAYS);
+        CandidateBox.setVgrow(GridBox, Priority.ALWAYS);
+        CandidateBox.setVgrow(JudgePane, Priority.ALWAYS);
 
         Node viewport = scrollPaneTable.lookup(".viewport");
         if (viewport instanceof Region) {
             ((Region) viewport).setClip(null);
         }
 
-        imgCandidate.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.90));
-        imgCandidate.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.90));
+//        imgCandidate.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.90));
+//        imgCandidate.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.90));
         imgCandidate.setPreserveRatio(false);
         imgCandidate.setSmooth(true);
         imgBanner.setImage(new Image("images/BannerSample.png"));
