@@ -136,6 +136,7 @@ public class GBingoController implements Initializable {
                     initDrawLabel();
                     initDrawGrid();
                     poTransaction = "";
+                    txtDrawnNo.requestFocus();
                 }
                 break;
             case "btnReset":
@@ -143,6 +144,7 @@ public class GBingoController implements Initializable {
                     initDrawLabel();
                     initDrawGrid();
                     poTransaction = "";
+                    txtDrawnNo.requestFocus();
                 }
                 break;
         }
