@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -13,7 +14,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -39,39 +39,45 @@
                               <Insets bottom="45.0" top="40.0" />
                            </VBox.margin>
                            <children>
-                              <VBox alignment="CENTER" prefHeight="260.0" prefWidth="220.0" style="-fx-background-color: #102E50; -fx-background-radius: 20;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <HBox spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label fx:id="lblDrawLetter" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="B" textAlignment="CENTER" textFill="WHITE" wrapText="true" VBox.vgrow="NEVER">
-                                       <font>
-                                          <Font name="System Bold" size="96.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets bottom="-10.0" left="-20.0" right="-20.0" top="-20.0" />
-                                       </padding>
-                                    </Label>
-                                    <Label fx:id="lblDrawNo" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="1" textAlignment="CENTER" textFill="WHITE" VBox.vgrow="NEVER">
-                                       <font>
-                                          <Font name="System Bold" size="130.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets bottom="-30.0" left="-20.0" right="-20.0" top="-40.0" />
-                                       </padding>
-                                    </Label>
-                                 </children></VBox>
+                                    <VBox alignment="CENTER" prefHeight="260.0" prefWidth="220.0" style="-fx-background-color: #102E50; -fx-background-radius: 20;">
+                                       <children>
+                                          <Label fx:id="lblDrawLetter" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="B" textAlignment="CENTER" textFill="WHITE" wrapText="true" VBox.vgrow="NEVER">
+                                             <font>
+                                                <Font name="System Bold" size="96.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="-10.0" left="-20.0" right="-20.0" top="-20.0" />
+                                             </padding>
+                                          </Label>
+                                          <Label fx:id="lblDrawNo" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" graphicTextGap="0.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="1" textAlignment="CENTER" textFill="WHITE" VBox.vgrow="NEVER">
+                                             <font>
+                                                <Font name="System Bold" size="130.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="-30.0" left="-20.0" right="-20.0" top="-40.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                    </VBox>
+                                    <ImageView fx:id="ivPattern" fitHeight="260.0" fitWidth="220.0" pickOnBounds="true" preserveRatio="true" />
+                                 </children>
+                              </HBox>
                            </children>
                         </AnchorPane>
                         <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                            <children>
                               <HBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Button fx:id="btnBack" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #102E50; -fx-background-radius: 10;">
+                                    <Button fx:id="btnBrowse" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #102E50; -fx-background-radius: 10;">
                                        <graphic>
-                                          <FontAwesomeIconView glyphName="MAIL_REPLY" size="25" style="-fx-fill: WHITE;" />
+                                          <FontAwesomeIconView glyphName="SEARCH" size="25" style="-fx-fill: WHITE;" />
                                        </graphic>
                                     </Button>
-                                    <Button fx:id="btnNext" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #102E50; -fx-background-radius: 10;">
+                                    <Button fx:id="btnNew" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #102E50; -fx-background-radius: 10;">
                                        <graphic>
-                                          <FontAwesomeIconView glyphName="MAIL_FORWARD" size="25" style="-fx-fill: white;" />
+                                          <FontAwesomeIconView glyphName="PLAY" size="25" style="-fx-fill: white;" />
                                        </graphic>
                                     </Button>
                                     <Button fx:id="btnReset" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: RED; -fx-background-radius: 10;" textFill="WHITE">
@@ -133,35 +139,6 @@
                                     <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
                                     <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
                                 </rowConstraints>
-                                 <children>
-                                    <StackPane fx:id="spBingoLetter" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="75.0" prefWidth="75.0" style="-fx-background-color: FF8200; -fx-background-radius: 20;">
-                                       <children>
-                                          <Label fx:id="lblBingoLetter" alignment="CENTER" text="B" textFill="#102e50">
-                                             <font>
-                                                <Font name="System Bold" size="72.0" />
-                                             </font>
-                                             <StackPane.margin>
-                                                <Insets />
-                                             </StackPane.margin>
-                                             <padding>
-                                                <Insets bottom="-20.0" left="-20.0" right="-20.0" top="-20.0" />
-                                             </padding>
-                                          </Label>
-                                       </children>
-                                    </StackPane>
-                                    <StackPane fx:id="spBingoNo" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="75.0" prefWidth="75.0" style="-fx-background-color: #102E50; -fx-background-radius: 20;" GridPane.columnIndex="1">
-                                       <children>
-                                          <Label fx:id="lblBingoNo" alignment="CENTER" text="1" textFill="WHITE">
-                                             <font>
-                                                <Font name="System Bold" size="72.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets bottom="-20.0" left="-20.0" right="-20.0" top="-20.0" />
-                                             </padding>
-                                          </Label>
-                                       </children>
-                                    </StackPane>
-                                 </children>
                               </GridPane>
                            </children>
                            <VBox.margin>
@@ -174,6 +151,9 @@
                   <Insets left="30.0" />
                </BorderPane.margin></AnchorPane>
          </center>
+         <bottom>
+            <TextField fx:id="txtDrawnNo" maxHeight="-Infinity" maxWidth="-Infinity" opacity="0.5" prefWidth="30.0" BorderPane.alignment="TOP_LEFT" />
+         </bottom>
       </BorderPane>
    </children>
 </AnchorPane>

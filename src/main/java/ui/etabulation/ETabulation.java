@@ -1,5 +1,4 @@
- package ui.etabulation;
-
+package ui.etabulation;
 
 import java.net.URL;
 import javafx.application.Application;
@@ -11,21 +10,23 @@ import javafx.scene.Parent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.guanzon.appdriver.base.GRider;
+import org.guanzon.appdriver.base.GRiderCAS;
+import org.guanzon.appdriver.base.MiscUtil;
+
 /**
  *
  * @author user
  */
-public class ETabulation extends Application{
+public class ETabulation extends Application {
 
     public final static String pxeMainFormTitle = "E - Tabulation";
     public final static String pxeMainForm = "/views/MainMenu.fxml";
-    public static GRider oApp;
+    public static GRiderCAS oApp;
 
     @Override
     public void start(Stage primaryStage) {
         try {
-            
+
             FXMLLoader view = new FXMLLoader();
             view.setLocation(getClass().getResource(pxeMainForm));
 
@@ -57,10 +58,22 @@ public class ETabulation extends Application{
     }
 
     public static void main(String[] args) {
+        String path;
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            path = "D:/GGC_Maven_Systems";
+        } else {
+            path = "/srv/GGC_Maven_Systems";
+        }
+        System.setProperty("sys.default.path.config", path);
+        System.setProperty("sys.default.path.images", path + "/images");
+        System.setProperty("sys.default.path.metadata", path + "/config/metadata/tabulation/");
+
+        //to do before connection
+        oApp = MiscUtil.Connect();
         launch(args);
     }
 
-    public void setGRider(GRider foValue) {
+    public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
 }

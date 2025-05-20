@@ -26,6 +26,7 @@ import javafx.application.Platform;
 
 import javafx.scene.control.TablePosition;
 import javafx.scene.input.KeyCode;
+import ui.etabulation.TableModelETabulation.Result;
 
 
 public class ETabulationUtils {
@@ -41,7 +42,6 @@ public class ETabulationUtils {
     public static final double W_AU = 10.0;  
     
     
-    // Utility method for converting Color to CSS RGB string
     public static String toRgbString(Color c) {
         return String.format("rgb(%d, %d, %d)",
             (int) (c.getRed() * 255),
@@ -52,7 +52,6 @@ public class ETabulationUtils {
     
     public static double computeWeightedPercent(double raw, double weight) {
         double pct = (raw / PERFECT_SCORE) * weight;
-        // round to 1 decimal: multiply, round, divide
         return Math.round(pct * 10.0) / 10.0;
     }
     
@@ -80,7 +79,6 @@ public class ETabulationUtils {
             R rowObj = ev.getRowValue();
             Object newVal = ev.getNewValue();
 
-            // 1) Extract a raw double from whatever newVal is
             double raw;
             if (newVal instanceof Number) {
                 raw = ((Number)newVal).doubleValue();
@@ -92,16 +90,12 @@ public class ETabulationUtils {
                 }
             }
 
-            // 2) Clamp with Math, not sun.internal clamp
             raw = Math.max(0.0, Math.min(PERFECT_SCORE, raw));
 
-            // 3) Compute weighted percentage (1-decimal place)
             double pct = Math.round((raw / PERFECT_SCORE) * weight * 10.0) / 10.0;
 
-            // 4) Write back the percent into the model
             setter.accept(rowObj, pct);
 
-            // 5) Recompute TOTAL and refresh
             @SuppressWarnings("unchecked")
             TableView<TableModelETabulation.Result> t =
                 (TableView<TableModelETabulation.Result>) (TableView<?>) table;
@@ -114,7 +108,6 @@ public class ETabulationUtils {
     
 
     
-    // Create a custom cell factory for your TableView columns.
     public static <T> Callback<TableColumn<TableModelETabulation.Result, T>, TableCell<TableModelETabulation.Result, T>> 
     createEditableCellFactory(double radiusX, double radiusY, Color circleColor) {
         return column -> new TableCell<TableModelETabulation.Result, T>() {
@@ -151,7 +144,6 @@ public class ETabulationUtils {
             
             @Override
             public void commitEdit(T newValue) {
-                // Update underlying model here if needed before commit
                 super.commitEdit(newValue);
                 setGraphic(stack);
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -179,7 +171,6 @@ public class ETabulationUtils {
             private void createTextField() {
                 textField = new TextField(getItem() == null ? "" : getItem().toString());
 
-                // Helper to parse whatever's in the text field into a double safely
                 Supplier<Double> parseRaw = () -> {
                     try {
                         return Double.parseDouble(textField.getText().trim());
@@ -188,7 +179,6 @@ public class ETabulationUtils {
                     }
                 };
 
-                // 1) When they press Enter, parse to a Double and commit THAT
                 textField.setOnAction(e -> {
                     double raw = parseRaw.get();
                     @SuppressWarnings("unchecked")
@@ -196,20 +186,25 @@ public class ETabulationUtils {
                     commitEdit(boxed);
                 });
 
-                // 2) When focus is lost (e.g. click or Tab), do the exact same
                 textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
                     if (!isNowFocused) {
                         double raw = parseRaw.get();
                         @SuppressWarnings("unchecked")
                         T boxed = (T) (Double) raw;
                         commitEdit(boxed);
+                       
+                    FrmETabulationController ctrl = FrmETabulationController.getController();
+                    Result rowItem = getTableView().getItems().get(getIndex());
+                    String groupId = rowItem.getGroupID();
+                    String termNo = ctrl.getTerminalNumber();
+                    int colPosition = getTableView().getVisibleLeafIndex(getTableColumn());
+                    int detailIdx = colPosition; 
+                    ctrl.setRating(groupId, termNo, detailIdx, raw);
                     }
                 });
 
-                // 3) **ONLY** handle Tab for navigation—no commit here!
                 textField.setOnKeyPressed(evt -> {
                     if (evt.getCode() == KeyCode.TAB) {
-                        // compute next editable column (skip first & last)
                         TableView<TableModelETabulation.Result> tv = getTableView();
                         int row = getIndex();
                         List<TableColumn<TableModelETabulation.Result, ?>> cols = tv.getVisibleLeafColumns();
@@ -235,7 +230,6 @@ public class ETabulationUtils {
     
     // Animate row style changes: background color and height.
     public static <T> void animateRowStyle(TableRow<T> row, Color targetColor, double targetHeight, Duration duration) {
-        // Animate Background Color
         ObjectProperty<Paint> bgColorProperty = (ObjectProperty<Paint>) row.getProperties().get("bgColor");
         if (bgColorProperty == null) {
             bgColorProperty = new SimpleObjectProperty<>(targetColor);
@@ -253,7 +247,6 @@ public class ETabulationUtils {
             colorTimeline.play();
         }
         
-        // Animate Row Height using its prefHeightProperty
         double currentHeight = row.getPrefHeight();
         if (currentHeight == 0) {
             currentHeight = targetHeight;

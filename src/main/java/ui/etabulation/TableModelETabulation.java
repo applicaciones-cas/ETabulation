@@ -17,10 +17,11 @@ public class TableModelETabulation {
         public final SimpleDoubleProperty total; 
         private final SimpleStringProperty imageUrl;
         private final SimpleStringProperty school;  
+        private final SimpleStringProperty groupid;  
 
         
-        public Result(String candidates, int sportswear, int filipiniana, int talent,
-                      int personality, int beauty, int audience, int dummyTotal, String imageUrl, String school) {
+        public Result(String candidates, double sportswear, double filipiniana, double talent,
+                      double personality, double beauty, double audience, double dummyTotal, String imageUrl, String school, String groupid) {
                       
             this.candidates = new SimpleStringProperty(candidates);
             this.sportswear = new SimpleDoubleProperty(sportswear);
@@ -29,17 +30,10 @@ public class TableModelETabulation {
             this.personality = new SimpleDoubleProperty(personality);
             this.beauty = new SimpleDoubleProperty(beauty);
             this.audience = new SimpleDoubleProperty(audience);
-//            this.total = new SimpleIntegerProperty(0);
-//            this.total.bind(
-//                this.sportswear.add(this.filipiniana)
-//                               .add(this.talent)
-//                               .add(this.personality)
-//                               .add(this.beauty)
-//                               .add(this.audience)
-//            );
             this.total = new SimpleDoubleProperty(dummyTotal);
             this.imageUrl = new SimpleStringProperty(imageUrl);
             this.school   = new SimpleStringProperty(school);
+            this.groupid   = new SimpleStringProperty(groupid);
         }
 
         
@@ -73,6 +67,9 @@ public class TableModelETabulation {
         public String getSchool() {
             return school.get();
         }
+        public String getGroupID() {
+            return groupid.get();
+        }
 
         
         public void setCandidates(String candidates) {
@@ -102,6 +99,9 @@ public class TableModelETabulation {
         }
         public void setSchool(String school) {
             this.school.set(school);
+        }
+        public void setGroupID(String groupid) {
+            this.groupid.set(groupid);
         }
         
         public SimpleStringProperty schoolProperty() { return school; }
