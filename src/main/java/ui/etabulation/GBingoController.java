@@ -27,6 +27,7 @@ import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.GRiderCAS;
 import ph.com.guanzongroup.gtabulate.Bingo;
 import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
+import static ui.etabulation.MainMenuController.oApp;
 
 public class GBingoController implements Initializable {
 
@@ -74,6 +75,10 @@ public class GBingoController implements Initializable {
     public void setScreenSize(int screenSize) {
         psScreenSize = screenSize;
 
+    }
+
+    public void setGRider(GRiderCAS poApp) {
+        oApp = poApp;
     }
 
     private void cmdButton_Click(ActionEvent event) {

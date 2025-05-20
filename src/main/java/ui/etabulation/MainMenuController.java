@@ -131,15 +131,18 @@ public class MainMenuController implements Initializable {
             case "GuanzonBingo1080":
                 GBingoCtrl = new GBingoController();
                 GBingoCtrl.setScreenSize(1080);
+                GBingoCtrl.setGRider(oApp);
 
                 return GBingoCtrl;
             case "GuanzonBingo1920":
                 GBingoCtrl = new GBingoController();
                 GBingoCtrl.setScreenSize(1920);
+                GBingoCtrl.setGRider(oApp);
                 //todo incase
                 return GBingoCtrl;
             case "frmETabulation":
                 FrmETabulationController Etabulation = new FrmETabulationController();
+                Etabulation.setGRider(oApp);
                 //todo incase
                 return Etabulation;
 
@@ -150,7 +153,7 @@ public class MainMenuController implements Initializable {
 
     }
 
-    void setGRider(GRiderCAS poApp) {
+    public void setGRider(GRiderCAS poApp) {
         oApp = poApp;
     }
 
