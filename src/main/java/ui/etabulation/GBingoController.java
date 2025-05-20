@@ -114,39 +114,47 @@ public class GBingoController implements Initializable {
 
     private void cmdButton_Click(ActionEvent event) {
         String lsButton = ((Button) event.getSource()).getId();
-
-        switch (lsButton) {
-            case "btnBrowse":
-                if (ShowMessageFX.YesNo(null, "Load Bingo", "Are you sure, do you want to Load Transaction?") == true) {
-                    initDrawLabel();
-                    initDrawGrid();
-                    poTransaction = "";
-                    poJSON = oTrans.searchTransaction("", true);
-                    if (!"success".equals(poJSON.get("result"))) {
-                        System.err.println("Unable to load Pattern: " + poJSON.get("message"));
+        try {
+            switch (lsButton) {
+                case "btnBrowse":
+                    if (ShowMessageFX.YesNo(null, "Load Bingo", "Are you sure, do you want to Load Transaction?") == true) {
+                        initDrawLabel();
+                        initDrawGrid();
                         poTransaction = "";
+                        poJSON = oTrans.searchTransaction("", true);
+                        if (!"success".equals(poJSON.get("result"))) {
+                            System.err.println("Unable to load Pattern: " + poJSON.get("message"));
+                            poTransaction = "";
+                        }
+                        poTransaction = oTrans.getMaster().getTransactionNo();
+                        loadTransaction();
+                        txtDrawnNo.requestFocus();
                     }
-                    poTransaction = oTrans.getMaster().getTransactionNo();
-                    loadTransaction();
-                    txtDrawnNo.requestFocus();
-                }
-                break;
-            case "btnNew":
-                if (ShowMessageFX.YesNo(null, "New Bingo", "Are you sure, do you want to New Transaction?") == true) {
-                    initDrawLabel();
-                    initDrawGrid();
-                    poTransaction = "";
-                    txtDrawnNo.requestFocus();
-                }
-                break;
-            case "btnReset":
-                if (ShowMessageFX.YesNo(null, "Reset Bingo", "Are you sure, do you want to Reset?") == true) {
-                    initDrawLabel();
-                    initDrawGrid();
-                    poTransaction = "";
-                    txtDrawnNo.requestFocus();
-                }
-                break;
+                    break;
+                case "btnNew":
+                    if (ShowMessageFX.YesNo(null, "New Bingo", "Are you sure, do you want to New Transaction?") == true) {
+
+                        initDrawLabel();
+                        initDrawGrid();
+                        poTransaction = "";
+                        getTransaction();
+                        txtDrawnNo.requestFocus();
+
+                    }
+                    break;
+                case "btnReset":
+                    if (ShowMessageFX.YesNo(null, "Reset Bingo", "Are you sure, do you want to Reset?") == true) {
+                        initDrawLabel();
+                        initDrawGrid();
+                        getTransaction();
+                        loadTransaction();
+                        poTransaction = oTrans.getMaster().getTransactionNo();
+                        txtDrawnNo.requestFocus();
+                    }
+                    break;
+            }
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(GBingoController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -169,6 +177,7 @@ public class GBingoController implements Initializable {
         CtrlBingoNo.clear();
         initBingoLetter();
         initBingoNo();
+        ivPattern.setImage(null);
     }
 
     private void initBingoLetter() {
@@ -234,15 +243,15 @@ public class GBingoController implements Initializable {
                     }
                     return;
                 case F3://search Pattern
+                    if (poTransaction.isEmpty()) {
+                        getTransaction();
+                    }
                     loJSON = oTrans.BingoPattern().searchRecord("", false);
                     if (!"success".equals(loJSON.get("result"))) {
                         System.err.println("Unable to load Pattern: " + loJSON.get("message"));
                     }
                     setPatternBingo();
-                    poJSON = oTrans.saveTransaction();
-                    if (!"success".equals((String) loJSON.get("result"))) {
-                        System.err.println((String) loJSON.get("message"));
-                    }
+                    saveTransaction();
 
                     event.consume();
                     return;
@@ -268,20 +277,11 @@ public class GBingoController implements Initializable {
                         if (!getBingoCtrl.getNoVisible()) {
                             getBingoCtrl.setNoVisible(true);
                             JSONObject loJSON;
-                            loJSON = oTrans.openTransaction(poTransaction);
-
-                            if (!"success".equals((String) loJSON.get("result"))) {
-                                System.err.println((String) loJSON.get("message"));
-                            }
-                            poTransaction = oTrans.getMaster().getTransactionNo();
+                            getTransaction();
 
                             oTrans.getDetail(oTrans.getDetailCount()).setBingoNo(lnDrawNo);
                             setDrawRecord(oTrans.getDetail(oTrans.getDetailCount() - 1).getBingoNo());
-                            //save record
-                            loJSON = oTrans.saveTransaction();
-                            if (!"success".equals((String) loJSON.get("result"))) {
-                                System.err.println((String) loJSON.get("message"));
-                            }
+                            saveTransaction();
                         }
                     }
                 }
@@ -289,7 +289,8 @@ public class GBingoController implements Initializable {
                 System.err.println("Invalid number entered: " + txtField.getText());
 
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(GBingoController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(GBingoController.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
             txtDrawnNo.setText("");
             txtDrawnNo.requestFocus();
@@ -350,6 +351,23 @@ public class GBingoController implements Initializable {
                     controller.setNoVisible(true);
                 }
             }
+        }
+
+    }
+
+    private void getTransaction() throws CloneNotSupportedException, SQLException, GuanzonException {
+        poJSON = oTrans.openTransaction(poTransaction);
+        if (!"success".equals(poJSON.get("result"))) {
+            System.err.println("Unable to load Pattern: " + poJSON.get("message"));
+            poTransaction = "";
+        }
+        poTransaction = oTrans.getMaster().getTransactionNo();
+    }
+
+    private void saveTransaction() throws CloneNotSupportedException, SQLException, GuanzonException {
+        poJSON = oTrans.saveTransaction();
+        if (!"success".equals((String) poJSON.get("result"))) {
+            System.err.println((String) poJSON.get("message"));
         }
 
     }
