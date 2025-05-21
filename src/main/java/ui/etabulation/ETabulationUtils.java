@@ -273,7 +273,7 @@ public class ETabulationUtils {
                 targetColor = Color.web("#FF8201");
                 targetHeight = 60;
             } else {
-                targetColor = (index % 2 == 0) ? Color.web("#FF8201") : Color.web("#b1b1b1");
+                targetColor = (index % 2 == 0) ? Color.web("#d8d8d8") : Color.web("#b1b1b1");
                 targetHeight = 40;
             }
             animateRowStyle(row, targetColor, targetHeight, Duration.millis(300));
