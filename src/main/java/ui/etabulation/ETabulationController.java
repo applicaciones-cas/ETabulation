@@ -2,29 +2,23 @@ package ui.etabulation;
 
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -32,8 +26,8 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -42,18 +36,13 @@ import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
-import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.gtabulate.Scoring;
 import ph.com.guanzongroup.gtabulate.model.Model_Contest_Participants;
@@ -94,8 +83,6 @@ public class ETabulationController implements Initializable {
     @FXML
     private TableView<TableModelETabulation> tblCandidate;
     private final ObservableList<TableModelETabulation> paParticipants = FXCollections.observableArrayList();
-    private final ObservableList<TableModelETabulation> paCriteria = FXCollections.observableArrayList();
-    private final List<List<TextField>> textFieldGrid = new ArrayList<>();
 
     private static GRiderCAS oApp;
     private Scoring oTrans;
@@ -132,19 +119,14 @@ public class ETabulationController implements Initializable {
             initRecord();
             initCriteria();
             initImages();
-            initListener();
 
             loadParticipants();
+            initListener();
 
-        } catch (SQLException ex) {
-            Logger.getLogger(FrmETabulationController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(FrmETabulationController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (CloneNotSupportedException ex) {
+        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(FrmETabulationController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        // TODO
     }
 
     void setGRider(GRiderCAS foApp) {
@@ -158,6 +140,7 @@ public class ETabulationController implements Initializable {
 
                 oApp = null;
                 stage.close();
+                event.consume();
             }
         }
     }
@@ -214,6 +197,7 @@ public class ETabulationController implements Initializable {
         index01.prefWidthProperty().bind(tblCandidate.widthProperty().multiply(contestantColumnRatio));
 
         for (int i = 0; i < criteriaCount; i++) {
+            final int criteriaIndex = i;
             final int columnIndex = i + 2;
             String criteriaDesc = oTrans.Criteria(i).getDescription();
             BigDecimal percent = (BigDecimal) oTrans.Criteria(i).getPercentage();
@@ -239,13 +223,40 @@ public class ETabulationController implements Initializable {
                     textField.setOnAction(e -> {
                         commitEdit(textField.getText());
                     });
+                    textField.setTextFormatter(new TextFormatter<String>(change -> {
+                        String newText = change.getControlNewText();
 
-                    // Cancel edit on focus lost
+                        if (newText.isEmpty()) {
+                            return change;
+                        }
+
+                        try {
+                            double value = Double.parseDouble(newText);
+
+                            if (value >= 0 && value <= 100) {
+                                if (newText.matches("^\\d{0,3}(\\.\\d{0,2})?$")) {
+                                    return change;
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            textField.setText("0.00");
+                        }
+                        return null; // reject change
+                    }));
+
                     textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
                         if (isNowFocused) {
                             getTableView().getSelectionModel().select(getIndex());
                         } else {
-                            commitEdit(textField.getText());
+                            try {
+                                double lnRate = Double.parseDouble(textField.getText());
+                                if (lnRate < 0 || lnRate > 100) {
+                                    lnRate = 100.00;
+                                }
+                                commitEdit(CommonUtils.NumberFormat(lnRate, "#0.00"));
+                            } catch (NumberFormatException ex) {
+                                commitEdit("0.00");
+                            }
                         }
                     });
                     textField.setOnMouseClicked(e -> {
@@ -291,29 +302,27 @@ public class ETabulationController implements Initializable {
                             TableColumn<TableModelETabulation, ?> nextCol = table.getVisibleLeafColumn(nextColIndex);
                             int finalNextRow = nextRow;
 
-                            Platform.runLater(() -> {
-                                table.edit(finalNextRow, nextCol);
+                            table.edit(finalNextRow, nextCol);
 
-                                // Try to find the TextField in the new cell and request focus
-                                TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, finalNextRow, nextColIndex);
-                                if (cell != null && cell.isEditing()) {
-                                    Node graphic = cell.getGraphic();
-                                    if (graphic instanceof StackPane) {
-                                        StackPane pane = (StackPane) graphic;
-                                        for (Node child : pane.getChildren()) {
-                                            if (child instanceof TextField) {
-                                                TextField tf = (TextField) child;
-                                                tf.requestFocus();
-                                                tf.selectAll();
-                                                break;
-                                            }
+                            TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, finalNextRow, nextColIndex);
+                            if (cell != null && cell.isEditing()) {
+                                Node graphic = cell.getGraphic();
+                                if (graphic instanceof StackPane) {
+                                    StackPane pane = (StackPane) graphic;
+                                    for (Node child : pane.getChildren()) {
+                                        if (child instanceof TextField) {
+                                            TextField tf = (TextField) child;
+                                            tf.requestFocus();
+                                            tf.selectAll();
+                                            break;
                                         }
                                     }
                                 }
-                            });
+                            }
                             lblContestantName.setText(paParticipants.get(finalNextRow).getIndex01().toString());
                             lblContestDetail.setText(paParticipants.get(finalNextRow).getIndex09().toString());
-                            
+                            setContestantImage(finalNextRow+1);
+
                             // Optional: scroll the ScrollPane if needed (ensure it's roughly synced)
                             double rowHeight = apCenterPanel.getHeight();
                             double scrollY = finalNextRow * rowHeight;
@@ -349,14 +358,16 @@ public class ETabulationController implements Initializable {
                 @Override
                 public void commitEdit(String newValue) {
                     super.commitEdit(newValue);
-                    TableModelETabulation model = getTableView().getItems().get(getIndex());
+                    TableModelETabulation loContestant = getTableView().getItems().get(getIndex());
                     try {
                         Method method = TableModelETabulation.class.getMethod("setIndex0" + columnIndex, String.class);
-                        method.invoke(model, newValue);
+                        method.invoke(loContestant, newValue);
+                        setTabulationDetail(loContestant.getIndex11(), criteriaIndex, newValue);
                     } catch (Exception ex) {
                         Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+
             });
 
             // Width binding
@@ -437,6 +448,9 @@ public class ETabulationController implements Initializable {
     }
 
     private void initImages() {
+
+        ivContestant.setImage(null);
+        apContestant.setVisible(false);
         ivContestant.layoutBoundsProperty().addListener((obs, oldB, newB) -> {
             Rectangle clip = new javafx.scene.shape.Rectangle();
             clip.setWidth(newB.getWidth());
@@ -455,10 +469,12 @@ public class ETabulationController implements Initializable {
                     this::cmdForm_Keypress);
         });
 
-        spCenter.vvalueProperty().addListener((obs, oldVal, newVal) -> {
-            double scrollY = newVal.doubleValue();
-            double maxV = spCenter.getContent().getBoundsInLocal().getHeight() - spCenter.getViewportBounds().getHeight();
-            apContestant.setLayoutY(scrollY * maxV);
+        Platform.runLater(() -> {
+            spCenter.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+                double scrollY = newVal.doubleValue();
+                double maxV = spCenter.getContent().getBoundsInLocal().getHeight() - spCenter.getViewportBounds().getHeight();
+                apContestant.setLayoutY(scrollY * maxV);
+            });
         });
     }
 
@@ -476,7 +492,6 @@ public class ETabulationController implements Initializable {
             String index08Value = "";
             int loParticipantCount = oTrans.getParticipantsCount();
             for (int lnCtr = 0; lnCtr < loParticipantCount; lnCtr++) {
-
                 Model_Contest_Participants poParticipants = oTrans.Participant(lnCtr);
                 oTrans.getMaster().setGroupId(poParticipants.getGroupId());
                 oTrans.getMaster().setComputerId(oApp.getTerminalNo());
@@ -516,6 +531,7 @@ public class ETabulationController implements Initializable {
                             break;
                         case 5:
                             index07Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                            break;
                         case 6:
                             index08Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
                             break;
@@ -535,12 +551,14 @@ public class ETabulationController implements Initializable {
                         index07Value,
                         index08Value,
                         lsDetailSchool,
-                        CommonUtils.NumberFormat(lnTotal, "##0.00")
+                        CommonUtils.NumberFormat(lnTotal, "##0.00"),
+                        poParticipants.getGroupId()
                 ));
 
             }
             if (pnRow >= 0) {
                 tblCandidate.getSelectionModel().select(pnRow);
+                getSelected(pnRow);
             } else {
                 //select first
                 tblCandidate.getSelectionModel().select(0);
@@ -590,60 +608,135 @@ public class ETabulationController implements Initializable {
         });
     }
 
-    private void getSelected(int pnRow) {
+    private void getSelected(int foRow) {
         lblContestantName.setText(paParticipants.get(pnRow).getIndex01().toString());
         lblContestDetail.setText(paParticipants.get(pnRow).getIndex09().toString());
 
-        Platform.runLater(() -> {
-            int firstEditableColIndex = 1;
+        setContestantImage(foRow+1);
+        int firstEditableColIndex = 1;
 
-            TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, pnRow, firstEditableColIndex);
-            if (cell != null) {
-                tblCandidate.edit(pnRow, cell.getTableColumn());
+        TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, pnRow, firstEditableColIndex);
+        if (cell != null) {
+            tblCandidate.edit(pnRow, cell.getTableColumn());
 
-                Node graphic = cell.getGraphic();
-                if (graphic instanceof StackPane) {
-                    StackPane pane = (StackPane) graphic;
-                    for (Node child : pane.getChildren()) {
-                        if (child instanceof TextField) {
-                            TextField tf = (TextField) child;
-                            tf.requestFocus();
-                            tf.selectAll();
-                            break;
-                        }
+            Node graphic = cell.getGraphic();
+            if (graphic instanceof StackPane) {
+                StackPane pane = (StackPane) graphic;
+                for (Node child : pane.getChildren()) {
+                    if (child instanceof TextField) {
+                        TextField tf = (TextField) child;
+                        tf.requestFocus();
+                        tf.selectAll();
+                        break;
                     }
                 }
             }
-        });
-
-    }
-
-    public JSONObject setRating(String recordId, String terminalNo, int detailIdx, double rate) {
-        JSONObject loJSON;
-
-        try {
-            loJSON = oTrans.openTransaction(recordId, terminalNo);
-            if (!"success".equals((String) loJSON.get("result"))) {
-                System.err.println((String) loJSON.get("message"));
-                return loJSON;
-            } else {
-                System.out.println("Successfully set");
-            }
-
-            oTrans.getDetail(detailIdx).setRate(rate);
-            System.out.println("Set score to: " + oTrans.getDetail(detailIdx).getRate());
-            System.out.println("detail id: " + detailIdx);
-
-            loJSON = oTrans.saveTransaction();
-            if (!"success".equals((String) loJSON.get("result"))) {
-                System.err.println((String) loJSON.get("message"));
-            }
-        } catch (CloneNotSupportedException | SQLException
-                | ExceptionInInitializerError | GuanzonException e) {
-            System.err.println(MiscUtil.getException(e));
-            loJSON = null;
         }
-        return loJSON;
+
     }
+
+    private void setTabulationDetail(String foGroup, int foCriteria, String foValue) {
+        try {
+            poJSON = oTrans.openTransaction(foGroup, oApp.getTerminalNo());
+            if (poJSON == null) {
+                return;
+            }
+            if (!"success".equals((String) poJSON.get("result"))) {
+                System.err.println((String) poJSON.get("message"));
+                return;
+            } else {
+                System.out.println("Tabulation = " + foGroup + " is Loaded");
+            }
+            oTrans.getDetail(foCriteria).setRate(Double.valueOf(foValue));
+
+            poJSON = oTrans.saveTransaction();
+            if (!"success".equals((String) poJSON.get("result"))) {
+                System.err.println((String) poJSON.get("message"));
+            } else {
+                //lag ito
+//                loadParticipants();
+//                recomputeTotal(pnRow);
+            }
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private void recomputeTotal(int pnRow) {
+        double ldCriteria = 0.00;
+        double ldPercentage = 0.00;
+        double lnTotal = 0.00;
+        for (int lnCtr = 0; lnCtr < oTrans.getCriteriaCount(); lnCtr++) {
+            ldPercentage = 0.00;
+
+            ldCriteria = Double.parseDouble(oTrans.Criteria(lnCtr).getPercentage().toString());
+            switch (lnCtr) {
+                case 0:
+                    ldPercentage = Double.parseDouble(paParticipants.get(pnRow).getIndex02().replace(",", ""));
+                    break;
+                case 1:
+                    ldPercentage = Double.parseDouble(paParticipants.get(pnRow).getIndex03().replace(",", ""));
+                    break;
+                case 2:
+                    ldPercentage = Double.parseDouble(paParticipants.get(pnRow).getIndex04().replace(",", ""));
+                    break;
+                case 3:
+                    ldPercentage = Double.parseDouble(paParticipants.get(pnRow).getIndex05().replace(",", ""));
+                    break;
+                case 4:
+                    ldPercentage = Double.parseDouble(paParticipants.get(pnRow).getIndex06().replace(",", ""));
+                    break;
+                case 5:
+                    ldPercentage = Double.parseDouble(paParticipants.get(pnRow).getIndex07().replace(",", ""));
+                    break;
+                case 6:
+                    ldPercentage = Double.parseDouble(paParticipants.get(pnRow).getIndex08().replace(",", ""));
+                    break;
+                default:
+                    ldPercentage = 0.0;
+                    break;
+
+            }
+
+            lnTotal += ldPercentage * (ldCriteria / 100.0);
+
+        }
+        paParticipants.get(pnRow).setIndex10(CommonUtils.NumberFormat(lnTotal, "##0.00"));
+        TableModelETabulation updatedItem = paParticipants.get(pnRow);
+        paParticipants.set(pnRow, null); // temporarily remove
+        paParticipants.set(pnRow, updatedItem);
+
+    }
+
+    private void setContestantImage(int participantNumber) {
+        String folderPath = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\" + participantNumber + "\\1.png";
+        File imgFile = new File(folderPath);
+
+        if (imgFile.exists()) {
+            ivContestant.setImage(new Image(imgFile.toURI().toString()));
+            apContestant.setVisible(true);
+        } else {
+            ivContestant.setImage(null);
+            apContestant.setVisible(false);
+        }
+    }
+
+    public String contestFolder(String ContestID) {
+
+        switch (ContestID) {
+            case "00001":
+                return "campus";
+            case "00002":
+                return "babe";
+            case "00003":
+                return "bulilit";
+            case "00004":
+                return "dream";
+            default:
+                return "campus";
+        }
+    }
+;
 
 }
