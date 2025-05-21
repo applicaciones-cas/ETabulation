@@ -270,7 +270,7 @@ public class ETabulationUtils {
             Color targetColor;
             double targetHeight;
             if (row.isSelected()) {
-                targetColor = Color.web("#cd7f32");
+                targetColor = Color.web("#FF8201");
                 targetHeight = 60;
             } else {
                 targetColor = (index % 2 == 0) ? Color.web("#d8d8d8") : Color.web("#b1b1b1");

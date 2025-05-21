@@ -75,7 +75,8 @@ public class MainMenuController implements Initializable {
                 openWindow("GuanzonBingo1080", "Guanzon Bingo", false);
                 break;
             case "mnuScoring":
-                openWindow("frmETabulation", "Tabulation", true);
+//                openWindow("frmETabulation", "Tabulation", true);
+                openWindow("ETabulation", "Tabulation", true);
                 break;
             case "mnuAbout":
                 openWindow("About", "About This App", false);
@@ -180,6 +181,11 @@ public class MainMenuController implements Initializable {
                 Etabulation.setGRider(oApp);
                 //todo incase
                 return Etabulation;
+            case "ETabulation":
+                ETabulationController ETabulation = new ETabulationController();
+                ETabulation.setGRider(oApp);
+                //todo incase
+                return ETabulation;
 
             default:
                 return null;

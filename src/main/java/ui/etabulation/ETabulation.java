@@ -32,7 +32,7 @@ public class ETabulation extends Application {
 
             FXMLLoader view = new FXMLLoader();
             view.setLocation(getClass().getResource(pxeMainForm));
-
+            
             MainMenuController controller = new MainMenuController();
             controller.setGRider(oApp);
 

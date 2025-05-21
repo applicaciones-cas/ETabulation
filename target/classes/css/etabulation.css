@@ -1,0 +1,162 @@
+.table-view {
+    -fx-background-color: transparent;
+    -fx-table-cell-border-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ABABAB;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    /*-fx-size: 40px;*/
+    -fx-font-size: 15px;
+}
+
+.table-view .column-header.header-1 {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ABABAB;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-font-size: 28px;
+    -fx-size: 40px;
+}
+
+.table-row-cell {
+    -fx-background-insets: 7px 10px -11px 0px;
+    -fx-padding:-5px 0 0 0px;
+    /*-fx-cell-size: 65px;*/
+    -fx-background-radius:50px;
+    -fx-text-fill: #ABABAB;
+
+}
+.table-row-cell:empty {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+.table-view .table-cell {
+    -fx-font-size: 18px;
+    -fx-alignment: center;
+    -fx-font-family: "Arial";
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #C6C6C6;
+}
+
+
+
+.table-row-cell:filled:selected,
+.table-row-cell:focused:selected {
+    -fx-background-color: #FC8001;
+    -fx-text-fill: #ABABAB;
+    -fx-font-weight: bold;
+}
+
+/* StackPane container for editable cell */
+.stack-pane-editable {
+    -fx-background-color: transparent;
+    -fx-padding: 0 20px 0 20px;
+    -fx-alignment: center;
+}
+
+/* Editable TextField inside TableCell */
+.stack-pane-editable .text-field {
+    -fx-background-color: #C4C4C4;
+    -fx-text-fill: black;
+    -fx-background-radius: 15px;
+    -fx-background-inset: -5px0 -5px 0 ;
+    -fx-font-size: 20px;
+    -fx-alignment: center;
+    -fx-padding: 0 20px 0 20px;
+}
+
+/* Optional: On focus effect */
+.stack-pane-editable .text-field:focused {
+    -fx-border-color: #FF8201;
+    -fx-effect: dropshadow(three-pass-box, #FF8201, 5, 0, 0, 0);
+}
+
+
+.table-cell {
+    -fx-alignment: center;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-weight: normal;
+    -fx-text-fill: black;
+    -fx-font-size: 18px;
+}
+
+.table-cell:selected {
+    -fx-text-fill: #ABABAB;
+}
+
+.label {
+    -fx-text-fill: #ABABAB;
+}
+
+.table-view .scroll-bar:vertical,
+.table-view .scroll-bar:horizontal {
+    -fx-background-color: #3B3B3B;
+}
+
+/* Scrollbar track */
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: #3B3B3B;
+    -fx-background-radius: 8;
+    -fx-padding: 0;
+}
+
+/* Scrollbar track background */
+.scroll-bar .track {
+    -fx-background-color: #616161;
+    -fx-background-radius: 8;
+}
+
+/* Scrollbar thumb (draggable part) */
+.scroll-bar .thumb {
+    -fx-background-color: #3B3B3B;
+    -fx-background-radius: 8;
+}
+
+/* Scrollbar increment/decrement buttons */
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: #616161;
+    -fx-padding: 0;
+    -fx-shape: "circle";
+}
+
+/* Remove arrows if needed */
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* Corner between scrollbars */
+.corner {
+    -fx-background-color: black;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
