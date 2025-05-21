@@ -1,5 +1,9 @@
 package ui.etabulation;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
@@ -67,12 +71,31 @@ public class ETabulation extends Application {
         System.setProperty("sys.default.path.images", path + "/images");
         System.setProperty("sys.default.path.metadata", path + "/config/metadata/tabulation/");
 
+        loadProperties();
+        
         //to do before connection
-        oApp = MiscUtil.Connect();
+        oApp = MiscUtil.Connect(System.getProperty("user.id"));
         launch(args);
     }
 
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
+    }
+    
+    private static boolean loadProperties() {
+        try {
+            Properties po_props = new Properties();
+            po_props.load(new FileInputStream(System.getProperty("sys.default.path.config") + "/config/cas.properties"));
+
+            System.setProperty("user.id", po_props.getProperty("user.id"));
+
+            return true;
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            return false;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 }
