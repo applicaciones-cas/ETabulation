@@ -1,0 +1,122 @@
+.table-view {
+    -fx-background-color: transparent;
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 10;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header, 
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-size: 45px;
+}
+
+.table-row-cell {
+    -fx-background-color: #BFBFBF;
+    -fx-background-insets: 0 0 0 0;
+    -fx-padding: 5px 5px;
+    -fx-background-radius: 20;
+    -fx-border-color: transparent;
+    -fx-font-size: 16px;
+    -fx-text-fill: black;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #C6C6C6;
+}
+
+
+
+.table-row-cell:filled:selected, 
+.table-row-cell:focused:selected {
+    -fx-background-color: #FF8800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.table-cell {
+    -fx-alignment: center;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-weight: normal;
+    -fx-text-fill: #2D2D2D;
+    -fx-font-size: 18px;
+}
+
+.table-cell:selected {
+    -fx-text-fill: white;
+}
+
+.label {
+    -fx-text-fill: #ABABAB;
+}
+
+.table-view .scroll-bar:vertical,
+.table-view .scroll-bar:horizontal {
+    -fx-background-color: #3B3B3B;
+}
+
+/* Scrollbar track */
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: #3B3B3B;
+    -fx-background-radius: 8;
+    -fx-padding: 0;
+}
+
+/* Scrollbar track background */
+.scroll-bar .track {
+    -fx-background-color: #616161;
+    -fx-background-radius: 8;
+}
+
+/* Scrollbar thumb (draggable part) */
+.scroll-bar .thumb {
+    -fx-background-color: #3B3B3B;
+    -fx-background-radius: 8;
+}
+
+/* Scrollbar increment/decrement buttons */
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: #616161;
+    -fx-padding: 0;
+    -fx-shape: "circle";
+}
+
+/* Remove arrows if needed */
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* Corner between scrollbars */
+.corner {
+    -fx-background-color: black;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -15,10 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="Background" fx:id="Background" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="980.0" prefWidth="1920.0" style="-fx-background-color: linear-gradient(to bottom right, #1a1a1a, #2e2e2e, #1c1c1c); -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
-    <stylesheets>
-        <URL value="@/css/frmetabulation.css" />
-    </stylesheets>
+<AnchorPane id="Background" fx:id="apMain" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="980.0" prefWidth="1920.0" style="-fx-background-color: linear-gradient(to bottom right, #1a1a1a, #2e2e2e, #1c1c1c); -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" styleClass="mainFxmlClass" stylesheets="@../css/etabulation.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -35,7 +30,7 @@
                   </ImageView>
                   <AnchorPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label maxWidth="1.7976931348623157E308" text="Campus Princess" textFill="#ababab" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Label fx:id="lblContestTitle" maxWidth="1.7976931348623157E308" text="Campus Princess" textFill="#ababab" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <padding>
                               <Insets left="20.0" />
                            </padding>
@@ -54,7 +49,7 @@
          <center>
             <AnchorPane fx:id="apCenterPanel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-background-color: #3B3B3B; -fx-background-radius: 30; -fx-effect: dropshadow(gaussian, #00000088, 10, 0.5, 0, 4);" BorderPane.alignment="CENTER">
                <children>
-                  <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <ScrollPane fx:id="spCenter" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="580.0" prefHeight="580.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <content>
                       <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                            <children>
@@ -62,24 +57,19 @@
                                  <children>
                                     <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <TableView editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
-                                            <columns>
-                                              <TableColumn prefWidth="75.0" text="C1" />
-                                              <TableColumn prefWidth="75.0" text="C2" />
-                                            </columns>
-                                          </TableView>
+                                          <TableView fx:id="tblCandidate" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="950.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
-                                    <AnchorPane style="-fx-background-color: #FF8201; -fx-background-radius: 30;" HBox.hgrow="NEVER">
+                                    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="415.0" style="-fx-background-color: #FF8201; -fx-background-radius: 30;" HBox.hgrow="NEVER">
                                        <children>
-                                          <ImageView fitHeight="465.0" fitWidth="365.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <ImageView fx:id="ivContestant" fitHeight="530.0" fitWidth="365.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <image>
                                                 <Image url="@../images/sample.jpg" />
                                              </image>
                                           </ImageView>
                                        </children>
                                        <HBox.margin>
-                                          <Insets bottom="25.0" left="15.0" right="15.0" top="25.0" />
+                                          <Insets right="30.0" />
                                        </HBox.margin>
                                        <padding>
                                           <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
@@ -91,16 +81,16 @@
                     </content>
                   </ScrollPane>
                </children>
-               <padding>
-                  <Insets bottom="30.0" left="30.0" right="20.0" top="30.0" />
-               </padding>
                <BorderPane.margin>
                   <Insets left="25.0" right="25.0" top="10.0" />
                </BorderPane.margin>
+               <padding>
+                  <Insets bottom="30.0" left="30.0" right="20.0" top="30.0" />
+               </padding>
             </AnchorPane>
          </center>
          <bottom>
-            <AnchorPane BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="apBottomPanel" BorderPane.alignment="CENTER">
                <children>
                   <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="150.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
@@ -119,12 +109,12 @@
                                           <Insets left="30.0" />
                                        </padding>
                                     </Label>
-                                    <Label alignment="CENTER" contentDisplay="BOTTOM" graphicTextGap="0.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="125.0" text="1. Cyrene Jhoy B. Fernandez" textFill="#ababab">
+                                    <Label fx:id="lblContestantName" alignment="CENTER" contentDisplay="BOTTOM" graphicTextGap="0.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="125.0" text="1. Cyrene Jhoy B. Fernandez" textFill="#ababab">
                                        <font>
                                           <Font size="48.0" />
                                        </font>
                                        <graphic>
-                                          <Label text="Senor Tesoro College Inc." textFill="#ababab">
+                                          <Label fx:id="lblContestDetail" text="Senor Tesoro College Inc." textFill="#ababab">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
@@ -150,7 +140,7 @@
                                           <Insets left="30.0" />
                                        </VBox.margin>
                                     </Label>
-                                    <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="100.0" text="Andrea Cayabyab" textFill="#ababab">
+                                    <Label fx:id="lblJudgeNm" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="100.0" text="Andrea Cayabyab" textFill="#ababab">
                                        <font>
                                           <Font size="48.0" />
                                        </font>
