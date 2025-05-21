@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ui.etabulation.ContestChoiceController"
+            stylesheets="@../css/contestchoice.css"
+            styleClass="dialog-root"
+            prefWidth="350" prefHeight="180">
+
+    <children>
+        <!-- Prompt Label -->
+        <Label text="Please choose your contest theme:"
+               layoutX="20" layoutY="20"
+               styleClass="dialog-label" />
+
+        <!-- ComboBox with 4 Static Choices -->
+        <ComboBox fx:id="themeComboBox"
+                  layoutX="20" layoutY="55"
+                  prefWidth="310"
+                  styleClass="dialog-combobox">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Kawasaki Campus Princess"/>
+                    <String fx:value="Guanzon Biker Babe"/>
+                    <String fx:value="Miss Guanzon Bulilit"/>
+                    <String fx:value="Honda Dream Boy"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <!-- OK and Cancel Buttons -->
+        <Button fx:id="okButton"
+                text="OK"
+                layoutX="70" layoutY="115"
+                prefWidth="90"
+                styleClass="dialog-button"
+                onAction="#onOkClicked" />
+
+        <Button fx:id="cancelButton"
+                text="Cancel"
+                layoutX="190" layoutY="115"
+                prefWidth="90"
+                styleClass="dialog-button"
+                onAction="#onCancelClicked" />
+    </children>
+</AnchorPane>

@@ -1,6 +1,7 @@
 package ui.etabulation;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,9 +11,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
@@ -34,6 +38,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
 import org.guanzon.appdriver.agent.services.Transaction;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.MiscUtil;
@@ -45,6 +50,7 @@ import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
 import ui.etabulation.TableModelETabulation.Result;
 import ui.etabulation.ETabulationUtils;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GuanzonException;
 
@@ -101,8 +107,14 @@ public class FrmETabulationController extends Transaction implements Initializab
     public void initialize(URL url, ResourceBundle rb) {
 
         //for testing
-        psContestID = "00001";
+//        psContestID = "00001";
         psJudgeName = "Waluigi";
+        try {
+            DialogueBox();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         try {
             tabcont = this;
             oTrans = new TabulationControllers(oApp, null).Scoring();
@@ -363,16 +375,21 @@ public class FrmETabulationController extends Transaction implements Initializab
 
         ResultTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
-
+                int selectedRow = ResultTable.getSelectionModel().getSelectedIndex() + 1;
+//                if (newSel.intValue() >= 0) {
+//                    int rowIndex = newSel.intValue();       
+//                    int displayIndex = rowIndex + 1;          
+//                }
+                
                 String fullPath = newSel.getImageUrl();
                 File imgFile = new File(fullPath);
 
                 if (imgFile.exists()) {
                     String uri = imgFile.toURI().toString();
-                    // e.g. "file:/D:/GGC_Maven_Systems/images/alice.png"
-                    imgCandidate.setImage(new Image(uri));
+                    setContestantImage(String.valueOf(selectedRow));
+//                    imgCandidate.setImage(new Image(uri));
                 } else {
-                    // fallback placeholder
+                    
                     imgCandidate.setImage(new Image("D:\\GGC_Maven_Systems\\images\\alice.png"));
                 }
                 txtJudgeName.setText(psJudgeName);
@@ -450,6 +467,125 @@ public class FrmETabulationController extends Transaction implements Initializab
         });
 
     }
+    
+
+    
+    
+    public void DialogueBox() throws IOException {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ContestChoice.fxml"));
+            Parent root = loader.load();
+            
+            ContestChoiceController ccController = loader.getController();
+            ccController.setParentController(this);
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
+            dialogStage.setTitle("Choose Contest Theme");
+
+            Scene scene = new Scene(root);
+            dialogStage.setScene(scene);
+            dialogStage.sizeToScene();
+            dialogStage.centerOnScreen();
+            scene.setFill(Color.TRANSPARENT);
+            dialogStage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String contestFolder(String ContestID) {
+
+        switch (ContestID) {
+            case "00001":
+                return "campus";
+            case "00002":
+                return "babe";
+            case "00003":
+                return "bulilit";
+            case "00004":
+                return "dream";
+            default:
+                return "campus";
+        }
+    };
+
+    private void setContestantImage(String participantNumber){
+        String aa;
+        switch (participantNumber){
+
+            
+            case "1":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\1\\1.png";
+                File imgFile1 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile1.toURI().toString()));
+                break;
+            case "2":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\2\\1.png";
+                File imgFile2 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile2.toURI().toString()));
+                break;
+            case "3":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\3\\1.png";
+                File imgFile3 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile3.toURI().toString()));
+                break;
+            case "4":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\4\\1.png";
+                File imgFile4 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile4.toURI().toString()));
+                break;
+            case "5":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\5\\1.png";
+                File imgFile5 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile5.toURI().toString()));
+                break;
+            case "6":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\6\\1.png";
+                File imgFile6 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile6.toURI().toString()));
+                break;
+            case "7":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\7\\1.png";
+                File imgFile7 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile7.toURI().toString()));
+                break;
+            case "8":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\8\\1.png";
+                File imgFile8 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile8.toURI().toString()));
+                break;
+            case "9":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\9\\1.png";
+                File imgFile9 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile9.toURI().toString()));
+                break;
+            case "10":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\10\\1.png";
+                File imgFile10 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile10.toURI().toString()));
+                break;
+            case "11":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\11\\1.png";
+                File imgFile11 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile11.toURI().toString()));
+                break;
+            case "12":
+                aa = "D:\\GGC_Maven_Systems\\images\\" + contestFolder(psContestID) + "\\12\\1.png";
+                File imgFile12 = new File(aa);
+                imgCandidate.setImage(new Image(imgFile12.toURI().toString()));
+                break;
+
+            default:
+                aa = "D:\\GGC_Maven_Systems\\images\\alice.png";
+                File imgFile = new File(aa);
+                imgCandidate.setImage(new Image(imgFile.toURI().toString()));
+        }
+    };
+
+
 
     public JSONObject setRating(String recordId, String terminalNo, int detailIdx, double rate) {
         JSONObject loJSON;
