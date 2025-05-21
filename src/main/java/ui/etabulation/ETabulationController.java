@@ -1,14 +1,24 @@
 package ui.etabulation;
 
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -21,6 +31,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -33,6 +45,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import org.guanzon.appdriver.agent.ShowMessageFX;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
@@ -77,16 +90,9 @@ public class ETabulationController implements Initializable {
     @FXML
     private ImageView ivContestant;
     @FXML
-    private TableView<TableModelETabulation.Result> tblCandidate;
-    private TableColumn<Result, String> columnCandidates;
-    private TableColumn<Result, Double> columnSportswear;
-    private TableColumn<Result, Double> columnFilipiniana;
-    private TableColumn<Result, Double> columnTalent;
-    private TableColumn<Result, Double> columnPersonality;
-    private TableColumn<Result, Double> columnBeauty;
-    private TableColumn<Result, Double> columnAudience;
-    private TableColumn<Result, Double> columnTotal;
-    private static List<TableModelETabulation.Result> poResults = new ArrayList<>();
+    private TableView<TableModelETabulation> tblCandidate;
+    private final ObservableList<TableModelETabulation> paParticipants = FXCollections.observableArrayList();
+    private final ObservableList<TableModelETabulation> paCriteria = FXCollections.observableArrayList();
 
     private static GRiderCAS oApp;
     private Scoring oTrans;
@@ -119,14 +125,12 @@ public class ETabulationController implements Initializable {
             }
 
             initRecord();
-            initTable();
-            initTableSetter();
+            initCriteria();
+//            initTableSetter();
             initImages();
             initListener();
 
-            new Thread(() -> {
-                loadResult();
-            }).start();
+            loadParticipants();
 
         } catch (SQLException ex) {
             Logger.getLogger(FrmETabulationController.class.getName()).log(Level.SEVERE, null, ex);
@@ -168,11 +172,10 @@ public class ETabulationController implements Initializable {
                 nextCol = (nextCol + 1) % colCount;
             }
 
-            tblCandidate.getFocusModel().focus(row,
-                    (TableColumn<TableModelETabulation.Result, ?>) tblCandidate.getVisibleLeafColumns().get(nextCol));
-            tblCandidate.edit(row,
-                    (TableColumn<TableModelETabulation.Result, ?>) tblCandidate.getVisibleLeafColumns().get(nextCol));
-
+//            tblCandidate.getFocusModel().focus(row,
+//                    (TableColumn<TableModelETabulation.Result, ?>) tblCandidate.getVisibleLeafColumns().get(nextCol));
+//            tblCandidate.edit(row,
+//                    (TableColumn<TableModelETabulation.Result, ?>) tblCandidate.getVisibleLeafColumns().get(nextCol));
             event.consume();
         }
 
@@ -192,135 +195,88 @@ public class ETabulationController implements Initializable {
         return loJSON;
     }
 
-    private void initTable() {
-        columnCandidates = new TableColumn<>("CANDIDATES");
-        columnSportswear = new TableColumn<>("SPORTSWEAR\n (15%)");
-        columnFilipiniana = new TableColumn<>("FILIPINIANA\n (15%)");
-        columnTalent = new TableColumn<>("TALENT\nPORTION\n (20%)");
-        columnPersonality = new TableColumn<>("PERSONALITY\n (25%)");
-        columnBeauty = new TableColumn<>("BEAUTY\nOF FACE\n (25%)");
-        columnAudience = new TableColumn<>("AUDIENCE\nIMPACT\n (10%)");
-        columnTotal = new TableColumn<>("TOTAL\nSCORE");
+    private void initCriteria() {
+        double contestantColumnRatio = 0.23; // 23% for contestant column
+        double remainingRatio = 1.0 - contestantColumnRatio;
+        int criteriaCount = oTrans.getCriteriaCount();
 
-        columnCandidates.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("candidates"));
-        columnSportswear.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("sportswear"));
-        columnFilipiniana.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("filipiniana"));
-        columnTalent.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("talent"));
-        columnPersonality.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("personality"));
-        columnBeauty.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("beauty"));
-        columnAudience.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("audience"));
+        // Contestant Column
+        TableColumn index01 = new TableColumn("Contestant");
+        index01.setCellValueFactory(new PropertyValueFactory<>("index01"));
+        index01.setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 10;");
+        tblCandidate.getColumns().add(index01);
 
-        columnTotal.setCellValueFactory(cellData -> cellData.getValue().totalProperty().asObject());
+        // Bind width
+        index01.prefWidthProperty().bind(tblCandidate.widthProperty().multiply(contestantColumnRatio));
 
-        columnCandidates.setStyle("-fx-alignment: center-left;");
-        columnSportswear.setStyle("-fx-alignment: center;");
-        columnFilipiniana.setStyle("-fx-alignment: center;");
-        columnTalent.setStyle("-fx-alignment: center;");
-        columnPersonality.setStyle("-fx-alignment: center;");
-        columnBeauty.setStyle("-fx-alignment: center;");
-        columnAudience.setStyle("-fx-alignment: center;");
-        columnTotal.setStyle("-fx-alignment: center;");
+        // Criteria Columns
+        for (int i = 0; i < criteriaCount; i++) {
+            final int columnIndex = i + 2;
+            String criteriaDesc = oTrans.Criteria(i).getDescription();
+            BigDecimal percent = (BigDecimal) oTrans.Criteria(i).getPercentage();
+            String columnTitle = criteriaDesc.toUpperCase() + "\n(" + CommonUtils.NumberFormat(percent, "#0") + "%)";
 
-        columnCandidates.setEditable(false);
-        columnSportswear.setEditable(true);
-        columnFilipiniana.setEditable(true);
-        columnTalent.setEditable(true);
-        columnPersonality.setEditable(true);
-        columnBeauty.setEditable(true);
-        columnAudience.setEditable(true);
-        columnTotal.setEditable(false);
+            TableColumn<TableModelETabulation, String> column = new TableColumn<>(columnTitle);
+            column.setStyle("-fx-alignment: CENTER;");
+            column.setSortable(false);
+            column.setEditable(true);
 
-        tblCandidate.setFixedCellSize(70);
+            column.setCellValueFactory(new PropertyValueFactory<>("index0" + columnIndex));
+            column.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        tblCandidate.getColumns().addAll(
-                columnCandidates, columnSportswear, columnFilipiniana,
-                columnTalent, columnPersonality, columnBeauty,
-                columnAudience, columnTotal
-        );
-        TableColumn<?, ?> firstCol = tblCandidate.getColumns().get(0);
-        firstCol.getStyleClass().add("header-1");
-        tblCandidate.getColumns().forEach(col -> col.setSortable(false));
+            // Bind width: divide remaining width among criteria columns
+            column.prefWidthProperty().bind(tblCandidate.widthProperty()
+                    .multiply(remainingRatio).divide(criteriaCount + 1)); // +1 for TOTAL column
 
-    }
+            // Handle editing with reflection
+            column.setOnEditCommit(event -> {
+                TableModelETabulation model = event.getRowValue();
+                try {
+                    Method method = TableModelETabulation.class.getMethod("setIndex0" + columnIndex, String.class);
+                    method.invoke(model, event.getNewValue());
+                } catch (Exception ex) {
+                    Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
 
-    private void initTableSetter() {
+            tblCandidate.getColumns().add(column);
+        }
+
+        // TOTAL column (fixed width)
+        TableColumn<TableModelETabulation, String> indexTotal = new TableColumn<>("TOTAL");
+        indexTotal.setCellValueFactory(new PropertyValueFactory<>("index10"));
+        indexTotal.setStyle("-fx-alignment: CENTER;");
+        indexTotal.setPrefWidth(75);
+        indexTotal.setSortable(false);
+        indexTotal.setResizable(false);
+        tblCandidate.getColumns().add(indexTotal);
+
+        // Prevent column header reordering
         tblCandidate.widthProperty().addListener((obs, oldW, newW) -> {
-            double width = newW.doubleValue();
-            columnCandidates.setPrefWidth(width * 0.3);
-            columnSportswear.setPrefWidth(width * 0.1);
-            columnFilipiniana.setPrefWidth(width * 0.1);
-            columnTalent.setPrefWidth(width * 0.1);
-            columnPersonality.setPrefWidth(width * 0.1);
-            columnBeauty.setPrefWidth(width * 0.1);
-            columnAudience.setPrefWidth(width * 0.1);
-            columnTotal.setPrefWidth(width * 0.09);
-        });
-        columnCandidates.setCellFactory(tc -> new TableCell<Result, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                setText((empty || item == null) ? null : (getIndex() + 1) + ". " + item);
+            TableHeaderRow header = (TableHeaderRow) tblCandidate.lookup("TableHeaderRow");
+            if (header != null) {
+                header.reorderingProperty().addListener((o, ov, nv) -> header.setReordering(false));
             }
         });
 
-        columnSportswear.setCellFactory(
-                ETabulationUtils.createEditableCellFactory(25, 15, Color.web("#c7c7c7"))
-        );
-        columnFilipiniana.setCellFactory(
-                ETabulationUtils.createEditableCellFactory(25, 15, Color.web("#c7c7c7"))
-        );
-        columnTalent.setCellFactory(
-                ETabulationUtils.createEditableCellFactory(25, 15, Color.web("#c7c7c7"))
-        );
-        columnPersonality.setCellFactory(
-                ETabulationUtils.createEditableCellFactory(25, 15, Color.web("#c7c7c7"))
-        );
-        columnBeauty.setCellFactory(
-                ETabulationUtils.createEditableCellFactory(25, 15, Color.web("#c7c7c7"))
-        );
-        columnAudience.setCellFactory(
-                ETabulationUtils.createEditableCellFactory(25, 15, Color.web("#c7c7c7"))
-        );
+        // Other setup
+        TableColumn<?, ?> firstCol = tblCandidate.getColumns().get(0);
+        firstCol.getStyleClass().add("header-1");
+        tblCandidate.getColumns().forEach(col -> col.setSortable(false));
+        tblCandidate.setFixedCellSize(70);
+        tblCandidate.setEditable(true);
+        tblCandidate.setItems(paParticipants);
 
-        columnTotal.setCellFactory(
-                ETabulationUtils.createEditableCellFactory(25, 15, Color.web("#c7c7c7"))
-        );
-
-        ETabulationUtils.bindPercentageColumn(
-                tblCandidate, columnSportswear,
-                TableModelETabulation.Result::setSportswear, ETabulationUtils.W_SW
-        );
-        ETabulationUtils.bindPercentageColumn(
-                tblCandidate, columnFilipiniana,
-                TableModelETabulation.Result::setFilipiniana, ETabulationUtils.W_FL
-        );
-        ETabulationUtils.bindPercentageColumn(
-                tblCandidate, columnTalent,
-                TableModelETabulation.Result::setTalent, ETabulationUtils.W_TA
-        );
-        ETabulationUtils.bindPercentageColumn(
-                tblCandidate, columnPersonality,
-                TableModelETabulation.Result::setPersonality, ETabulationUtils.W_PE
-        );
-        ETabulationUtils.bindPercentageColumn(
-                tblCandidate, columnBeauty,
-                TableModelETabulation.Result::setBeauty, ETabulationUtils.W_BE
-        );
-        ETabulationUtils.bindPercentageColumn(
-                tblCandidate, columnAudience,
-                TableModelETabulation.Result::setAudience, ETabulationUtils.W_AU
-        );
-
-        //listener for table
+        //animete    
         tblCandidate.setRowFactory(tv -> {
-            TableRow<Result> row = new TableRow<>();
-            row.selectedProperty().addListener((obs, oldSel, newSel) -> {
-                ETabulationUtils.updateRowStyle(row, row.getIndex());
+            TableRow<TableModelETabulation> tblRow = new TableRow<>();
+            tblRow.selectedProperty().addListener((obs, oldSel, newSel) -> {
+                ETabulationUtils.updateRowStyle(tblRow, tblRow.getIndex());
             });
-            row.itemProperty().addListener((obs, oldItem, newItem) -> {
-                ETabulationUtils.updateRowStyle(row, row.getIndex());
+            tblRow.itemProperty().addListener((obs, oldItem, newItem) -> {
+                ETabulationUtils.updateRowStyle(tblRow, tblRow.getIndex());
             });
-            return row;
+            return tblRow;
         });
 
     }
@@ -338,27 +294,27 @@ public class ETabulationController implements Initializable {
     }
 
     private void initListener() {
-
-        tblCandidate.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
-            if (newSel != null) {
-
-                String fullPath = newSel.getImageUrl();
-                File imgFile = new File(fullPath);
-
-                if (imgFile.exists()) {
-                    String uri = imgFile.toURI().toString();
-                    // e.g. "file:/D:/GGC_Maven_Systems/images/alice.png"
-//                    imgCandidate.setImage(new Image(uri));
-                } else {
-                    // fallback placeholder
-//                    imgCandidate.setImage(new Image("D:\\GGC_Maven_Systems\\images\\alice.png"));
-                }
-                lblJudgeNm.setText(psJudgeName);
-                lblContestantName.setText(newSel.getCandidates());
-                lblContestDetail.setText(newSel.getSchool());
-
-            }
-        });
+//
+//        tblCandidate.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+//            if (newSel != null) {
+//
+//                String fullPath = newSel.getImageUrl();
+//                File imgFile = new File(fullPath);
+//
+//                if (imgFile.exists()) {
+//                    String uri = imgFile.toURI().toString();
+//                    // e.g. "file:/D:/GGC_Maven_Systems/images/alice.png"
+////                    imgCandidate.setImage(new Image(uri));
+//                } else {
+//                    // fallback placeholder
+////                    imgCandidate.setImage(new Image("D:\\GGC_Maven_Systems\\images\\alice.png"));
+//                }
+//                lblJudgeNm.setText(psJudgeName);
+//                lblContestantName.setText(newSel.getCandidates());
+//                lblContestDetail.setText(newSel.getSchool());
+//
+//            }
+//        });
 
         Platform.runLater(() -> {
             apMain.getScene().addEventFilter(KeyEvent.KEY_PRESSED,
@@ -380,53 +336,84 @@ public class ETabulationController implements Initializable {
         });
     }
 
-    private void loadResult() {
-        poResults = new ArrayList<>();
-        int count = oTrans.getParticipantsCount();
-        for (int i = 0; i < count; i++) {
-            try {
-                Model_Contest_Participants p = oTrans.Participant(i);
+    private void loadParticipants() {
+        try {
+            paParticipants.clear();
 
-                //get participant school/town name
-                Model_Contest_Participants_Meta loMeta = oTrans.ParticipantMeta(p.getGroupId(), "00002");
-                String school = loMeta.getValue();
+            double lnTotal = 0.00;
+            String index02Value = "";
+            String index03Value = "";
+            String index04Value = "";
+            String index05Value = "";
+            String index06Value = "";
+            String index07Value = "";
+            String index08Value = "";
+            int loParticipantCount = oTrans.getParticipantsCount();
+            for (int lnCtr = 0; lnCtr < loParticipantCount; lnCtr++) {
 
-                //get participant name
-                loMeta = oTrans.ParticipantMeta(p.getGroupId(), "00001");
-                String name = loMeta.getValue();
-
-                //get participant picture name
-                loMeta = oTrans.ParticipantMeta(p.getGroupId(), "00003");
-                String img = loMeta.getValue();
-                img = System.getProperty("sys.default.path.images") + img.substring(45);
-
-                oTrans.getMaster().setGroupId(p.getGroupId());
+                Model_Contest_Participants poParticipants = oTrans.Participant(lnCtr);
+                oTrans.getMaster().setGroupId(poParticipants.getGroupId());
                 oTrans.getMaster().setComputerId(oApp.getTerminalNo());
-                oTrans.openTransaction(p.getGroupId(), oApp.getTerminalNo());
-//                    oTrans.getDetail(1).getRate()
-                System.out.println("Set score to: " + String.valueOf(oTrans.getDetail(1).getRate()));
-                poResults.add(new TableModelETabulation.Result(
-                        name,
-                        oTrans.getDetail(1).getRate(),
-                        oTrans.getDetail(2).getRate(),
-                        oTrans.getDetail(3).getRate(),
-                        oTrans.getDetail(4).getRate(),
-                        oTrans.getDetail(5).getRate(),
-                        oTrans.getDetail(6).getRate(),
-                        0,
-                        img,
-                        school,
-                        p.getGroupId()
+                oTrans.openTransaction(poParticipants.getGroupId(), oApp.getTerminalNo());
+                Model_Contest_Participants_Meta poParticipantMetaNm = oTrans.ParticipantMeta(poParticipants.getGroupId(), "00001");
+                String lsContestantName = poParticipants.getEntryNo() + ". " + poParticipantMetaNm.getValue();
+
+                Model_Contest_Participants_Meta poParticipantMetaSchool = oTrans.ParticipantMeta(poParticipants.getGroupId(), "00002");
+                String lsDetailSchool = poParticipantMetaSchool.getValue();
+
+                Model_Contest_Participants_Meta poParticipantMetaImg = oTrans.ParticipantMeta(poParticipants.getGroupId(), "00003");
+                String lsCandidateImg = poParticipantMetaImg.getValue();
+                lsCandidateImg = System.getProperty("sys.default.path.images") + lsCandidateImg.substring(45);
+
+                int loCriteria = oTrans.getCriteriaCount();
+                for (int lnCtrCriterea = 0; lnCtrCriterea < loCriteria; lnCtrCriterea++) {
+                    Double loRate = oTrans.getDetail(lnCtrCriterea).getRate();
+                    double critValue = (loRate != null) ? loRate : 0.0;
+
+                    switch (lnCtrCriterea) {
+                        case 0:
+                            index02Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                            break;
+                        case 1:
+                            index03Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                            break;
+                        case 2:
+                            index04Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                            break;
+                        case 3:
+                            index05Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                            break;
+                        case 4:
+                            index06Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                            break;
+                        case 5:
+                            index07Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                        case 6:
+                            index08Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                            break;
+                        default:
+                            // Handle additional criteria values if needed
+                            break;
+                    }
+                    lnTotal += critValue;
+                }
+                paParticipants.add(new TableModelETabulation(
+                        lsContestantName,
+                        index02Value,
+                        index03Value,
+                        index04Value,
+                        index05Value,
+                        index06Value,
+                        index07Value,
+                        index08Value,
+                        lsDetailSchool,
+                        String.valueOf(lnTotal)
                 ));
-            } catch (Exception ex) {
-                ex.printStackTrace();
+
             }
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        Platform.runLater(() -> {
-            tblCandidate.getItems().setAll(poResults);
-
-        });
-
     }
 
     public JSONObject setRating(String recordId, String terminalNo, int detailIdx, double rate) {

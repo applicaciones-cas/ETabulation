@@ -15,7 +15,7 @@
     -fx-text-fill: #ABABAB;
     -fx-font-weight: bold;
     -fx-alignment: center;
-    -fx-size: 40px;
+    /*-fx-size: 40px;*/
     -fx-font-size: 15px;
 }
 
@@ -31,7 +31,7 @@
 .table-row-cell {
     -fx-background-insets: 7px 10px -11px 0px;
     -fx-padding:-5px 0 0 0px;
-    -fx-cell-size: 65px;
+    /*-fx-cell-size: 65px;*/
     -fx-background-radius:50px;
     -fx-text-fill: #ABABAB;
 
@@ -57,6 +57,28 @@
     -fx-background-color: #FC8001;
     -fx-text-fill: #ABABAB;
     -fx-font-weight: bold;
+}
+
+/* Highlight editable cells */
+.table-view .table-cell:editable {
+    -fx-background-color: #2A2A2A;
+    -fx-text-fill: black;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 1px;
+    -fx-border-radius: 15px;
+    -fx-padding: 6px;
+}
+
+/* Optional: Focused editable cell */
+.table-view .table-cell:editable:focused {
+    -fx-background-color: white;
+    -fx-border-color: #81C784;
+}
+
+/* Optional: Editable cell when selected */
+.table-view .table-row-cell:selected .table-cell:editable {
+    -fx-background-color: #444444;
+    -fx-text-fill: #FFFFFF;
 }
 
 .table-cell {
