@@ -31,15 +31,20 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import static javafx.scene.input.KeyCode.DOWN;
+import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
@@ -54,9 +59,6 @@ import ph.com.guanzongroup.gtabulate.Scoring;
 import ph.com.guanzongroup.gtabulate.model.Model_Contest_Participants;
 import ph.com.guanzongroup.gtabulate.model.Model_Contest_Participants_Meta;
 import ph.com.guanzongroup.gtabulate.model.services.TabulationControllers;
-import static ui.etabulation.FrmETabulationController.oApp;
-import static ui.etabulation.FrmETabulationController.tabcont;
-import ui.etabulation.TableModelETabulation.Result;
 
 /**
  * FXML Controller class
@@ -68,7 +70,7 @@ public class ETabulationController implements Initializable {
     @FXML
     private AnchorPane apMain;
     @FXML
-    private AnchorPane apMainBanner;
+    private AnchorPane apMainBanner, apContestant;
     @FXML
     private ImageView imgBanner;
     @FXML
@@ -93,12 +95,14 @@ public class ETabulationController implements Initializable {
     private TableView<TableModelETabulation> tblCandidate;
     private final ObservableList<TableModelETabulation> paParticipants = FXCollections.observableArrayList();
     private final ObservableList<TableModelETabulation> paCriteria = FXCollections.observableArrayList();
+    private final List<List<TextField>> textFieldGrid = new ArrayList<>();
 
     private static GRiderCAS oApp;
     private Scoring oTrans;
     private String psContestID = "";
     private String psJudgeName = "";
     private JSONObject poJSON;
+    private int pnRow = -1;
 
     /**
      * Initializes the controller class.
@@ -123,10 +127,10 @@ public class ETabulationController implements Initializable {
             if (!"success".equals(poJSON.get("result"))) {
                 System.err.println("Init failed: " + poJSON.get("message"));
             }
-
+            lblContestDetail.setText("");
+            lblContestantName.setText("");
             initRecord();
             initCriteria();
-//            initTableSetter();
             initImages();
             initListener();
 
@@ -196,7 +200,7 @@ public class ETabulationController implements Initializable {
     }
 
     private void initCriteria() {
-        double contestantColumnRatio = 0.23; // 23% for contestant column
+        double contestantColumnRatio = 0.21; // 21% for contestant column
         double remainingRatio = 1.0 - contestantColumnRatio;
         int criteriaCount = oTrans.getCriteriaCount();
 
@@ -209,7 +213,6 @@ public class ETabulationController implements Initializable {
         // Bind width
         index01.prefWidthProperty().bind(tblCandidate.widthProperty().multiply(contestantColumnRatio));
 
-        // Criteria Columns
         for (int i = 0; i < criteriaCount; i++) {
             final int columnIndex = i + 2;
             String criteriaDesc = oTrans.Criteria(i).getDescription();
@@ -222,22 +225,143 @@ public class ETabulationController implements Initializable {
             column.setEditable(true);
 
             column.setCellValueFactory(new PropertyValueFactory<>("index0" + columnIndex));
-            column.setCellFactory(TextFieldTableCell.forTableColumn());
 
-            // Bind width: divide remaining width among criteria columns
-            column.prefWidthProperty().bind(tblCandidate.widthProperty()
-                    .multiply(remainingRatio).divide(criteriaCount + 1)); // +1 for TOTAL column
+            column.setCellFactory(col -> new TableCell<TableModelETabulation, String>() {
+                private final TextField textField = new TextField();
+                private final StackPane pane = new StackPane(textField);
 
-            // Handle editing with reflection
-            column.setOnEditCommit(event -> {
-                TableModelETabulation model = event.getRowValue();
-                try {
-                    Method method = TableModelETabulation.class.getMethod("setIndex0" + columnIndex, String.class);
-                    method.invoke(model, event.getNewValue());
-                } catch (Exception ex) {
-                    Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
+                {
+                    textField.setAlignment(Pos.CENTER);
+                    StackPane.setAlignment(textField, Pos.CENTER);
+                    pane.getStyleClass().add("stack-pane-editable");
+
+                    // Commit edit on Enter key press
+                    textField.setOnAction(e -> {
+                        commitEdit(textField.getText());
+                    });
+
+                    // Cancel edit on focus lost
+                    textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+                        if (isNowFocused) {
+                            getTableView().getSelectionModel().select(getIndex());
+                        } else {
+                            commitEdit(textField.getText());
+                        }
+                    });
+                    textField.setOnMouseClicked(e -> {
+                        getTableView().getSelectionModel().select(getIndex());
+                    });
+
+                    textField.setOnAction(e -> commitEdit(textField.getText()));
+                    textField.setOnKeyPressed(event -> {
+                        if (event.getCode() == KeyCode.TAB) {
+                            commitEdit(textField.getText());
+
+                            TableView<TableModelETabulation> table = getTableView();
+                            int currentRow = getIndex();
+                            TableColumn<TableModelETabulation, ?> currentColumn = getTableColumn();
+                            int currentColIndex = table.getVisibleLeafIndex(currentColumn);
+                            int totalCols = table.getVisibleLeafColumns().size();
+
+                            int nextRow = currentRow;
+                            int nextColIndex;
+
+                            if (event.isShiftDown()) {
+                                if (currentColIndex > 1) {
+                                    nextColIndex = currentColIndex - 1;
+                                } else if (currentRow > 0) {
+                                    nextRow = currentRow - 1;
+                                    nextColIndex = totalCols - 2;
+                                } else {
+                                    event.consume();
+                                    return;
+                                }
+                            } else {
+                                if (currentColIndex < totalCols - 2) {
+                                    nextColIndex = currentColIndex + 1;
+                                } else if (currentRow < table.getItems().size() - 1) {
+                                    nextRow = currentRow + 1;
+                                    nextColIndex = 1;
+                                } else {
+                                    event.consume();
+                                    return;
+                                }
+                            }
+
+                            TableColumn<TableModelETabulation, ?> nextCol = table.getVisibleLeafColumn(nextColIndex);
+                            int finalNextRow = nextRow;
+
+                            Platform.runLater(() -> {
+                                table.edit(finalNextRow, nextCol);
+
+                                // Try to find the TextField in the new cell and request focus
+                                TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, finalNextRow, nextColIndex);
+                                if (cell != null && cell.isEditing()) {
+                                    Node graphic = cell.getGraphic();
+                                    if (graphic instanceof StackPane) {
+                                        StackPane pane = (StackPane) graphic;
+                                        for (Node child : pane.getChildren()) {
+                                            if (child instanceof TextField) {
+                                                TextField tf = (TextField) child;
+                                                tf.requestFocus();
+                                                tf.selectAll();
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            lblContestantName.setText(paParticipants.get(finalNextRow).getIndex01().toString());
+                            lblContestDetail.setText(paParticipants.get(finalNextRow).getIndex09().toString());
+                            
+                            // Optional: scroll the ScrollPane if needed (ensure it's roughly synced)
+                            double rowHeight = apCenterPanel.getHeight();
+                            double scrollY = finalNextRow * rowHeight;
+                            double scrollMax = tblCandidate.getItems().size() * rowHeight;
+                            double scrollValue = scrollY / scrollMax;
+
+                            // Clamp value between 0 and 1
+                            scrollValue = Math.min(1.0, Math.max(0.0, scrollValue));
+                            spCenter.setVvalue(scrollValue);
+                            event.consume();
+                        }
+                    });
+                }
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        textField.setText(item);
+                        setGraphic(pane);
+                    }
+                }
+
+                @Override
+                public void startEdit() {
+                    super.startEdit();
+                    textField.requestFocus();
+                    textField.selectAll();
+                }
+
+                @Override
+                public void commitEdit(String newValue) {
+                    super.commitEdit(newValue);
+                    TableModelETabulation model = getTableView().getItems().get(getIndex());
+                    try {
+                        Method method = TableModelETabulation.class.getMethod("setIndex0" + columnIndex, String.class);
+                        method.invoke(model, newValue);
+                    } catch (Exception ex) {
+                        Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             });
+
+            // Width binding
+            column.prefWidthProperty().bind(tblCandidate.widthProperty()
+                    .multiply(remainingRatio).divide(criteriaCount + 1));
 
             tblCandidate.getColumns().add(column);
         }
@@ -246,7 +370,7 @@ public class ETabulationController implements Initializable {
         TableColumn<TableModelETabulation, String> indexTotal = new TableColumn<>("TOTAL");
         indexTotal.setCellValueFactory(new PropertyValueFactory<>("index10"));
         indexTotal.setStyle("-fx-alignment: CENTER;");
-        indexTotal.setPrefWidth(75);
+        indexTotal.setPrefWidth(95);
         indexTotal.setSortable(false);
         indexTotal.setResizable(false);
         tblCandidate.getColumns().add(indexTotal);
@@ -281,6 +405,37 @@ public class ETabulationController implements Initializable {
 
     }
 
+    @SuppressWarnings("unchecked")
+    private TableCell<TableModelETabulation, ?> getCell(
+            TableView<TableModelETabulation> table, int rowIndex, int colIndex) {
+
+        for (Node rowNode : table.lookupAll(".table-row-cell")) {
+            if (rowNode instanceof TableRow<?>) {
+                TableRow<?> rawRow = (TableRow<?>) rowNode;
+
+                if (rawRow.getIndex() == rowIndex) {
+                    TableRow<TableModelETabulation> row = (TableRow<TableModelETabulation>) rawRow;
+
+                    for (Node cellNode : row.lookupAll(".table-cell")) {
+                        if (cellNode instanceof TableCell<?, ?>) {
+                            TableCell<?, ?> rawCell = (TableCell<?, ?>) cellNode;
+
+                            TableCell<TableModelETabulation, ?> cell = (TableCell<TableModelETabulation, ?>) rawCell;
+
+                            TableColumn<TableModelETabulation, ?> tableColumn
+                                    = (TableColumn<TableModelETabulation, ?>) cell.getTableColumn();
+
+                            if (tableColumn != null && table.getVisibleLeafIndex(tableColumn) == colIndex) {
+                                return cell;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private void initImages() {
         ivContestant.layoutBoundsProperty().addListener((obs, oldB, newB) -> {
             Rectangle clip = new javafx.scene.shape.Rectangle();
@@ -294,45 +449,16 @@ public class ETabulationController implements Initializable {
     }
 
     private void initListener() {
-//
-//        tblCandidate.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
-//            if (newSel != null) {
-//
-//                String fullPath = newSel.getImageUrl();
-//                File imgFile = new File(fullPath);
-//
-//                if (imgFile.exists()) {
-//                    String uri = imgFile.toURI().toString();
-//                    // e.g. "file:/D:/GGC_Maven_Systems/images/alice.png"
-////                    imgCandidate.setImage(new Image(uri));
-//                } else {
-//                    // fallback placeholder
-////                    imgCandidate.setImage(new Image("D:\\GGC_Maven_Systems\\images\\alice.png"));
-//                }
-//                lblJudgeNm.setText(psJudgeName);
-//                lblContestantName.setText(newSel.getCandidates());
-//                lblContestDetail.setText(newSel.getSchool());
-//
-//            }
-//        });
 
         Platform.runLater(() -> {
             apMain.getScene().addEventFilter(KeyEvent.KEY_PRESSED,
                     this::cmdForm_Keypress);
         });
 
-        Platform.runLater(() -> {
-            tblCandidate.addEventFilter(KeyEvent.KEY_PRESSED,
-                    this::cmdTable_Keypress);
-        });
-
-        Platform.runLater(() -> {
-            for (Node node : tblCandidate.lookupAll(".column-header .label")) {
-                if (node instanceof Labeled) {
-                    ((Labeled) node).setAlignment(Pos.CENTER);
-                    ((Labeled) node).setTextAlignment(TextAlignment.CENTER);
-                }
-            }
+        spCenter.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+            double scrollY = newVal.doubleValue();
+            double maxV = spCenter.getContent().getBoundsInLocal().getHeight() - spCenter.getViewportBounds().getHeight();
+            apContestant.setLayoutY(scrollY * maxV);
         });
     }
 
@@ -364,11 +490,13 @@ public class ETabulationController implements Initializable {
                 Model_Contest_Participants_Meta poParticipantMetaImg = oTrans.ParticipantMeta(poParticipants.getGroupId(), "00003");
                 String lsCandidateImg = poParticipantMetaImg.getValue();
                 lsCandidateImg = System.getProperty("sys.default.path.images") + lsCandidateImg.substring(45);
-
+                lnTotal = 0.0;
                 int loCriteria = oTrans.getCriteriaCount();
                 for (int lnCtrCriterea = 0; lnCtrCriterea < loCriteria; lnCtrCriterea++) {
                     Double loRate = oTrans.getDetail(lnCtrCriterea).getRate();
+                    BigDecimal loRatePercencentage = oTrans.Criteria(lnCtrCriterea).getPercentage();
                     double critValue = (loRate != null) ? loRate : 0.0;
+                    double critPercentage = (loRatePercencentage != null) ? Double.valueOf(String.valueOf(loRatePercencentage)) : 0.0;
 
                     switch (lnCtrCriterea) {
                         case 0:
@@ -395,7 +523,7 @@ public class ETabulationController implements Initializable {
                             // Handle additional criteria values if needed
                             break;
                     }
-                    lnTotal += critValue;
+                    lnTotal += critValue * (critPercentage / 100.0);
                 }
                 paParticipants.add(new TableModelETabulation(
                         lsContestantName,
@@ -407,13 +535,87 @@ public class ETabulationController implements Initializable {
                         index07Value,
                         index08Value,
                         lsDetailSchool,
-                        String.valueOf(lnTotal)
+                        CommonUtils.NumberFormat(lnTotal, "##0.00")
                 ));
 
+            }
+            if (pnRow >= 0) {
+                tblCandidate.getSelectionModel().select(pnRow);
+            } else {
+                //select first
+                tblCandidate.getSelectionModel().select(0);
+                pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
+                getSelected(pnRow);
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @FXML
+    private void tblParticipantClick(MouseEvent event) {
+        pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
+        if (pnRow < 0) {
+            return;
+        }
+        getSelected(pnRow);
+        // Key navigation (Up/Down) handling as you had before
+        tblCandidate.setOnKeyReleased((KeyEvent t) -> {
+            KeyCode key = t.getCode();
+            switch (key) {
+                case DOWN:
+                    pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
+                    if (pnRow >= tblCandidate.getItems().size() - 1) {
+                        pnRow = tblCandidate.getItems().size() - 1;
+                    } else {
+                        pnRow = pnRow + 1;
+                    }
+                    break;
+
+                case UP:
+                    pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
+                    if (pnRow < 1) {
+                        pnRow = 0;
+                    } else {
+                        pnRow = pnRow - 1;
+                    }
+                    break;
+
+                default:
+                    return;
+            }
+
+            getSelected(pnRow + 1);
+
+        });
+    }
+
+    private void getSelected(int pnRow) {
+        lblContestantName.setText(paParticipants.get(pnRow).getIndex01().toString());
+        lblContestDetail.setText(paParticipants.get(pnRow).getIndex09().toString());
+
+        Platform.runLater(() -> {
+            int firstEditableColIndex = 1;
+
+            TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, pnRow, firstEditableColIndex);
+            if (cell != null) {
+                tblCandidate.edit(pnRow, cell.getTableColumn());
+
+                Node graphic = cell.getGraphic();
+                if (graphic instanceof StackPane) {
+                    StackPane pane = (StackPane) graphic;
+                    for (Node child : pane.getChildren()) {
+                        if (child instanceof TextField) {
+                            TextField tf = (TextField) child;
+                            tf.requestFocus();
+                            tf.selectAll();
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
     }
 
     public JSONObject setRating(String recordId, String terminalNo, int detailIdx, double rate) {

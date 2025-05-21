@@ -9,7 +9,7 @@
     -fx-border-color: transparent;
 }
 
-.table-view .column-header, 
+.table-view .column-header,
 .table-view .filler {
     -fx-background-color: transparent;
     -fx-text-fill: #ABABAB;
@@ -52,34 +52,37 @@
 
 
 
-.table-row-cell:filled:selected, 
+.table-row-cell:filled:selected,
 .table-row-cell:focused:selected {
     -fx-background-color: #FC8001;
     -fx-text-fill: #ABABAB;
     -fx-font-weight: bold;
 }
 
-/* Highlight editable cells */
-.table-view .table-cell:editable {
-    -fx-background-color: #2A2A2A;
+/* StackPane container for editable cell */
+.stack-pane-editable {
+    -fx-background-color: transparent;
+    -fx-padding: 0 20px 0 20px;
+    -fx-alignment: center;
+}
+
+/* Editable TextField inside TableCell */
+.stack-pane-editable .text-field {
+    -fx-background-color: #C4C4C4;
     -fx-text-fill: black;
-    -fx-border-color: #4CAF50;
-    -fx-border-width: 1px;
-    -fx-border-radius: 15px;
-    -fx-padding: 6px;
+    -fx-background-radius: 15px;
+    -fx-background-inset: -5px0 -5px 0 ;
+    -fx-font-size: 20px;
+    -fx-alignment: center;
+    -fx-padding: 0 20px 0 20px;
 }
 
-/* Optional: Focused editable cell */
-.table-view .table-cell:editable:focused {
-    -fx-background-color: white;
-    -fx-border-color: #81C784;
+/* Optional: On focus effect */
+.stack-pane-editable .text-field:focused {
+    -fx-border-color: #FF8201;
+    -fx-effect: dropshadow(three-pass-box, #FF8201, 5, 0, 0, 0);
 }
 
-/* Optional: Editable cell when selected */
-.table-view .table-row-cell:selected .table-cell:editable {
-    -fx-background-color: #444444;
-    -fx-text-fill: #FFFFFF;
-}
 
 .table-cell {
     -fx-alignment: center;
