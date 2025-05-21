@@ -230,13 +230,15 @@ public class ETabulationController implements Initializable {
         columnAudience.setEditable(true);
         columnTotal.setEditable(false);
 
-        tblCandidate.setFixedCellSize(100);
+        tblCandidate.setFixedCellSize(70);
+
         tblCandidate.getColumns().addAll(
                 columnCandidates, columnSportswear, columnFilipiniana,
                 columnTalent, columnPersonality, columnBeauty,
                 columnAudience, columnTotal
         );
-
+        TableColumn<?, ?> firstCol = tblCandidate.getColumns().get(0);
+        firstCol.getStyleClass().add("header-1");
         tblCandidate.getColumns().forEach(col -> col.setSortable(false));
 
     }

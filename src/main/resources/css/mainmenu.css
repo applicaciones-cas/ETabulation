@@ -1,9 +1,5 @@
 
-#BorderPaneCenter {
-    -fx-background-color: #3b3b3b;
-    -fx-background-radius: 40px;
-    -fx-border-radius: 40px;
-}
+
 .root {
     -fx-font-family: "Arial";
 }
