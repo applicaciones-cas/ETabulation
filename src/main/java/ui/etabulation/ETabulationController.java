@@ -279,10 +279,11 @@ public class ETabulationController implements Initializable {
                     });
                     textField.setOnMouseClicked(e -> {
                         int currentIndex =getTableView().getSelectionModel().getSelectedIndex();
-                        if ( currentIndex> pnRow
-                                ||  currentIndex < pnRow) {
+                        if ( currentIndex > pnRow
+                                ||  currentIndex  < pnRow) {
                             pnRow = currentIndex;
                             loadParticipants();
+                            getSelected(pnRow);
                         }
                         getTableView().getSelectionModel().select(getIndex());
                     });
