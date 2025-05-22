@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" fx:id="apMain" onKeyReleased="#FieldKeyPressed" style="-fx-background-color: linear-gradient(to right, #3B3B3B, #2F2F2F, #1A1A1A); -fx-background-insets: -5 -3 -4 -4; -fx-background-radius: 13; -fx-border-radius: 10; -fx-border-color: white; -fx-border-width: 3;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <StackPane blendMode="SRC_ATOP" style="-fx-background-radius: 15; -fx-border-radius: 15;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <BorderPane style="-fx-background-radius: 15; -fx-border-radius: 15;">
+               <center>
+                  <AnchorPane blendMode="OVERLAY" prefHeight="115.0" prefWidth="350.0" style="-fx-background-radius: 15;" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </BorderPane.margin>
+                     <children>
+                        <AnchorPane fx:id="ImageBg" style="-fx-background-size: Stretch; -fx-background-repeat: no-repeat; -fx-border-color: #2F2F2F; -fx-border-radius: 20; -fx-border-width: 5;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <Label alignment="CENTER" layoutX="41.0" layoutY="33.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="JUDGE" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="0.0">
+                                 <font>
+                                    <Font name="Arial Bold" size="18.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="15.0" right="5.0" />
+                                 </padding>
+                              </Label>
+                              <TextField fx:id="txtField01" layoutX="94.0" layoutY="35.0" prefHeight="30.0" prefWidth="250.0" AnchorPane.rightAnchor="10.0" />
+                           </children></AnchorPane>
+                     </children>
+                  </AnchorPane>
+               </center>
+                </BorderPane>
+            </children>
+        </StackPane>
+    </children>
+</AnchorPane>

@@ -2,6 +2,7 @@ package ui.etabulation;
 
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -13,9 +14,12 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
@@ -35,7 +39,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -98,9 +104,7 @@ public class ETabulationController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
 
         try {
-            //control's close form and scorlling
-            initListener();
-            psJudgeName = "awtas";
+            clearForm();
             oTrans = new TabulationControllers(oApp, null).Scoring();
             poJSON = oTrans.initTransaction();
             if (!"success".equals(poJSON.get("result"))) {
@@ -113,32 +117,18 @@ public class ETabulationController implements Initializable {
             } else {
                 psContestID = oTrans.ContestMaster().getModel().getContestId();
                 psContestDescript = oTrans.ContestMaster().getModel().getDescription();
-            }
 
-            if (!psContestID.isEmpty() && !psJudgeName.isEmpty()) {
                 oTrans.setContestId(psContestID);
-                oTrans.setJudgeName(psJudgeName);
-                lblContestTitle.setText(psContestDescript);
 
-                poJSON = initRecord();
-                if (!"success".equals(poJSON.get("result"))) {
-                    System.err.println("Init failed: " + poJSON.get("message"));
-                    pbLoaded = false;
-                }
-                lblContestDetail.setText("");
-                lblContestantName.setText("");
-                initRecord();
-                initCriteria();
-
-                Platform.runLater(() -> {
-                    loadParticipants();
-                });
-            } else {
-                ShowMessageFX.Error("Unable to load Record, Constest ID and Judge Name is Required", pxeModuleName, "");
-                pbLoaded = false;
             }
+            if (psContestID.isEmpty()) {
+                ShowMessageFX.Error("Unable to load Record, Constest ID is Required.", "Warning", "");
+                pbLoaded = false;
 
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+            }
+            initController();
+
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(FrmETabulationController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -308,7 +298,7 @@ public class ETabulationController implements Initializable {
                                 } else if (currentRow < table.getItems().size() - 1) {
                                     nextRow = currentRow + 1;
                                     nextColIndex = 1;
-                                        loadParticipants();
+                                    loadParticipants();
                                     pnRow = nextRow;
                                 } else {
                                     event.consume();
@@ -388,7 +378,7 @@ public class ETabulationController implements Initializable {
                         } catch (Exception ex) {
                             Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    } 
+                    }
                 }
 
             });
@@ -471,20 +461,23 @@ public class ETabulationController implements Initializable {
         return null;
     }
 
-    private void initListener() {
-        ivContestant.setImage(null);
-        lblContestTitle.setText("");
-        lblContestDetail.setText("");
-        lblContestantName.setText("");
-        lblJudgeNm.setText("");
-        lblPerforming.setText("");
-
-        apMain.sceneProperty().addListener((obs, oldScene, newScene) -> {
+    private void initController() {
+        apMain.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.addEventFilter(KeyEvent.KEY_PRESSED, this::cmdForm_Keypress);
                 if (!pbLoaded) {
                     stageclose();
+                    return;
                 }
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.showingProperty().addListener((obsShowing, wasShowing, isNowShowing) -> {
+                            if (isNowShowing) {
+                                Platform.runLater(() -> initLoadForm());
+                            }
+                        });
+                    }
+                });
             }
         });
 
@@ -495,6 +488,36 @@ public class ETabulationController implements Initializable {
                 apContestant.setLayoutY(scrollY * maxV);
             });
         });
+    }
+
+    private void initLoadForm() {
+        try {
+            
+            psJudgeName = loadJudge();
+            if (psJudgeName.isEmpty()) {
+//                ShowMessageFX.Warning("Unable to load Record, Judge is Required.", "Warning", null);
+                pbLoaded = false;
+                stageclose();
+                return;
+            }
+
+            oTrans.setJudgeName(psJudgeName);
+            lblContestTitle.setText(psContestDescript);
+            lblJudgeNm.setText(psJudgeName);
+
+            poJSON = initRecord();
+            if (!"success".equals(poJSON.get("result"))) {
+                System.err.println("Init failed: " + poJSON.get("message"));
+                pbLoaded = false;
+                return;
+            }
+
+            initCriteria();
+            loadParticipants();
+
+        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+            Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void loadParticipants() {
@@ -658,10 +681,11 @@ public class ETabulationController implements Initializable {
 
     private void setTabulationDetail(String foGroup, int foCriteria, String foValue) {
         try {
-            poJSON = oTrans.openTransaction(foGroup, oApp.getTerminalNo());
-            if (poJSON == null) {
+            if (oApp == null) {
                 return;
             }
+            poJSON = oTrans.openTransaction(foGroup, oApp.getTerminalNo());
+
             if (!"success".equals((String) poJSON.get("result"))) {
                 System.err.println((String) poJSON.get("message"));
                 return;
@@ -715,6 +739,54 @@ public class ETabulationController implements Initializable {
             oApp = null;
             stage.close();
         });
+    }
+
+    private String loadJudge() {
+        try {
+
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("/views/childJudge.fxml"));
+
+            ChildJudgeController loControl = new ChildJudgeController();
+
+            fxmlLoader.setController(loControl);
+
+            Stage stage = new Stage();
+            //load the main interface
+            Parent parent = fxmlLoader.load();
+
+            //set the main interface as the scene
+            Scene scene = new Scene(parent);
+            stage.setScene(scene);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("");
+            stage.showAndWait();
+            
+            String loJudge = loControl.getJudgeNo().trim();
+
+            stage.close();
+            return loJudge;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            ShowMessageFX.Warning(e.getMessage(), "Warning", null);
+            System.exit(1);
+        }
+        return "";
+    }
+
+    private void clearForm() {
+        ivContestant.setImage(null);
+        lblContestTitle.setText("");
+        lblContestDetail.setText("");
+        lblContestantName.setText("");
+        lblJudgeNm.setText("");
+        psJudgeName = "";
+        psContestID = "";
+        psContestDescript = "";
+        paParticipants.clear();
+
     }
 
 }
