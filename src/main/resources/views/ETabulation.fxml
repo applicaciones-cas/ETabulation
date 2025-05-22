@@ -74,11 +74,6 @@
                                     </AnchorPane>
                                  </children>
                               </HBox>
-                              <Label fx:id="lblJudgeNm" alignment="CENTER" layoutX="1134.0" layoutY="818.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="100.0" text="Andrea Cayabyab" textFill="#ababab">
-                                 <font>
-                                    <Font size="48.0" />
-                                 </font>
-                              </Label>
                            </children>
                         </AnchorPane>
                     </content>
@@ -142,6 +137,11 @@
                                        <VBox.margin>
                                           <Insets left="30.0" />
                                        </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblJudgeNm" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="100.0" text="Andrea Cayabyab" textFill="#ababab">
+                                       <font>
+                                          <Font size="48.0" />
+                                       </font>
                                     </Label>
                                  </children></VBox>
                            </children>
