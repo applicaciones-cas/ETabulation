@@ -263,6 +263,13 @@ public class ETabulationController implements Initializable {
 
                     textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
                         if (isNowFocused) {
+//                            int currentIndex = getTableView().getSelectionModel().getSelectedIndex();
+//                            if (currentIndex > pnRow
+//                                    || currentIndex < pnRow) {
+//                                pnRow = currentIndex;
+//                                loadParticipants();
+//                                getSelected(pnRow);
+//                            }
                             getTableView().getSelectionModel().select(getIndex());
 
                         } else {
@@ -278,13 +285,6 @@ public class ETabulationController implements Initializable {
                         }
                     });
                     textField.setOnMouseClicked(e -> {
-                        int currentIndex =getTableView().getSelectionModel().getSelectedIndex();
-                        if ( currentIndex > pnRow
-                                ||  currentIndex  < pnRow) {
-                            pnRow = currentIndex;
-                            loadParticipants();
-                            getSelected(pnRow);
-                        }
                         getTableView().getSelectionModel().select(getIndex());
                     });
 
@@ -615,16 +615,17 @@ public class ETabulationController implements Initializable {
                 ));
 
             }
-            if (pnRow <= 0) {
+            if (pnRow < 0) {
                 //select first
                 tblCandidate.getSelectionModel().select(0);
                 pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
                 getSelected(pnRow);
-            } else {
-                tblCandidate.getSelectionModel().select(pnRow);
-                pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
-                getSelected(pnRow);
             }
+//            else {
+//                tblCandidate.getSelectionModel().select(pnRow);
+//                pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
+//                getSelected(pnRow);
+//            }
 
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
