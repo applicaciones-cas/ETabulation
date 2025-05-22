@@ -264,6 +264,7 @@ public class ETabulationController implements Initializable {
                     textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
                         if (isNowFocused) {
                             getTableView().getSelectionModel().select(getIndex());
+
                         } else {
                             try {
                                 double lnRate = Double.parseDouble(textField.getText());
@@ -277,12 +278,19 @@ public class ETabulationController implements Initializable {
                         }
                     });
                     textField.setOnMouseClicked(e -> {
+                        int currentIndex =getTableView().getSelectionModel().getSelectedIndex();
+                        if ( currentIndex> pnRow
+                                ||  currentIndex < pnRow) {
+                            pnRow = currentIndex;
+                            loadParticipants();
+                        }
                         getTableView().getSelectionModel().select(getIndex());
                     });
 
                     textField.setOnAction(e -> commitEdit(textField.getText()));
                     textField.setOnKeyPressed(event -> {
-                        if (event.getCode() == KeyCode.TAB) {
+                        if (event.getCode() == KeyCode.TAB
+                                || event.getCode() == KeyCode.ENTER) {
                             commitEdit(textField.getText());
 
                             TableView<TableModelETabulation> table = getTableView();
