@@ -220,7 +220,7 @@ public class ETabulationController implements Initializable {
                 columnTitle = criteriaDesc.toUpperCase()
                         + "\n(" + CommonUtils.NumberFormat(percent, "#0") + "%)";
             }
-             TableColumn<TableModelETabulation, String> column = new TableColumn<>(columnTitle);
+            TableColumn<TableModelETabulation, String> column = new TableColumn<>(columnTitle);
             column.setStyle("-fx-alignment: CENTER;");
             column.setSortable(false);
             column.setEditable(true);
@@ -628,9 +628,9 @@ public class ETabulationController implements Initializable {
         if (pnRow < 0) {
             return;
         }
-        loadParticipants();
         getSelected(pnRow);
-        
+
+        loadParticipants();
         // Key navigation (Up/Down) handling as you had before
         tblCandidate.setOnKeyReleased((KeyEvent t) -> {
             KeyCode key = t.getCode();
@@ -692,6 +692,9 @@ public class ETabulationController implements Initializable {
     private void setTabulationDetail(String foGroup, int foCriteria, String foValue) {
         try {
             if (oApp == null) {
+                return;
+            }
+            if (foValue.isEmpty()) {
                 return;
             }
             poJSON = oTrans.openTransaction(foGroup, oApp.getTerminalNo());
