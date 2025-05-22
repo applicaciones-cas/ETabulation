@@ -628,7 +628,9 @@ public class ETabulationController implements Initializable {
         if (pnRow < 0) {
             return;
         }
+        loadParticipants();
         getSelected(pnRow);
+        
         // Key navigation (Up/Down) handling as you had before
         tblCandidate.setOnKeyReleased((KeyEvent t) -> {
             KeyCode key = t.getCode();
