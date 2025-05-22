@@ -188,9 +188,15 @@ public class ETabulationController implements Initializable {
     }
 
     private void initCriteria() {
-        double contestantColumnRatio = 0.21; // 21% for contestant column
-        double remainingRatio = 1.0 - contestantColumnRatio;
+
         int criteriaCount = oTrans.getCriteriaCount();
+        double contestantColumnRatio;
+        if (criteriaCount > 4) {
+            contestantColumnRatio = 0.18;
+        } else {
+            contestantColumnRatio = 0.21;
+        }
+        double remainingRatio = 1.0 - contestantColumnRatio;
 
         // Contestant Column
         TableColumn index01 = new TableColumn("Contestant");
@@ -206,9 +212,15 @@ public class ETabulationController implements Initializable {
             final int columnIndex = i + 2;
             String criteriaDesc = oTrans.Criteria(i).getDescription();
             BigDecimal percent = (BigDecimal) oTrans.Criteria(i).getPercentage();
-            String columnTitle = criteriaDesc.toUpperCase() + "\n(" + CommonUtils.NumberFormat(percent, "#0") + "%)";
-
-            TableColumn<TableModelETabulation, String> column = new TableColumn<>(columnTitle);
+            String columnTitle;
+            if (criteriaCount > 4 && criteriaDesc.length() > 12) {
+                columnTitle = criteriaDesc.replace(" ", "\n").toUpperCase()
+                        + "(" + CommonUtils.NumberFormat(percent, "#0") + "%)";
+            } else {
+                columnTitle = criteriaDesc.toUpperCase()
+                        + "\n(" + CommonUtils.NumberFormat(percent, "#0") + "%)";
+            }
+             TableColumn<TableModelETabulation, String> column = new TableColumn<>(columnTitle);
             column.setStyle("-fx-alignment: CENTER;");
             column.setSortable(false);
             column.setEditable(true);
@@ -492,7 +504,6 @@ public class ETabulationController implements Initializable {
 
     private void initLoadForm() {
         try {
-            
             psJudgeName = loadJudge();
             if (psJudgeName.isEmpty()) {
 //                ShowMessageFX.Warning("Unable to load Record, Judge is Required.", "Warning", null);
@@ -500,10 +511,9 @@ public class ETabulationController implements Initializable {
                 stageclose();
                 return;
             }
-
             oTrans.setJudgeName(psJudgeName);
             lblContestTitle.setText(psContestDescript);
-            lblJudgeNm.setText(psJudgeName);
+            lblJudgeNm.setText(psJudgeName.toUpperCase());
 
             poJSON = initRecord();
             if (!"success".equals(poJSON.get("result"))) {
@@ -511,10 +521,8 @@ public class ETabulationController implements Initializable {
                 pbLoaded = false;
                 return;
             }
-
             initCriteria();
             loadParticipants();
-
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -762,7 +770,7 @@ public class ETabulationController implements Initializable {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("");
             stage.showAndWait();
-            
+
             String loJudge = loControl.getJudgeNo().trim();
 
             stage.close();

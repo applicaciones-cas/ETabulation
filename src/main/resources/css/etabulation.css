@@ -24,8 +24,9 @@
     -fx-text-fill: #ABABAB;
     -fx-font-weight: bold;
     -fx-alignment: center;
+    -fx-font-wrap: center;
     -fx-font-size: 28px;
-    -fx-size: 40px;
+    -fx-size: 45px;
 }
 
 .table-row-cell {
@@ -37,7 +38,7 @@
 }
 .table-row-cell:empty {
     -fx-border-color: transparent;
-    -fx-background-color: transparent;
+    -fx-background-color: transparent !important;
 }
 .table-view .table-cell {
     -fx-font-size: 20px;
