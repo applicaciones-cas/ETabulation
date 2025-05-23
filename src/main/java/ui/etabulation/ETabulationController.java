@@ -676,26 +676,6 @@ public class ETabulationController implements Initializable {
         lblContestDetail.setText(paParticipants.get(pnRow).getIndex09().toString());
 
         setContestantImage(foRow + 1);
-        int firstEditableColIndex = 1;
-
-        TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, pnRow, firstEditableColIndex);
-        if (cell != null) {
-            tblCandidate.edit(pnRow, cell.getTableColumn());
-
-            Node graphic = cell.getGraphic();
-            if (graphic instanceof StackPane) {
-                StackPane pane = (StackPane) graphic;
-                for (Node child : pane.getChildren()) {
-                    if (child instanceof TextField) {
-                        TextField tf = (TextField) child;
-                        tf.requestFocus();
-                        tf.selectAll();
-                        break;
-                    }
-                }
-            }
-        }
-
     }
 
     private void setTabulationDetail(String foGroup, int foCriteria, String foValue) {
