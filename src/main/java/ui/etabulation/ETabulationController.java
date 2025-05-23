@@ -256,7 +256,6 @@ public class ETabulationController implements Initializable {
                         if (currentRow > pnRow || currentRow < pnRow) {
 
                             loadParticipants();
-                            getSelected(currentRow);
 
                             TableView<TableModelETabulation> table = getTableView();
                             TableColumn<TableModelETabulation, ?> currentColumn = getTableColumn();
@@ -282,6 +281,7 @@ public class ETabulationController implements Initializable {
                             }
                         }
                         pnRow = currentRow;
+                        getSelected(pnRow);
                     });
 
                     textField.setOnAction(e -> commitEdit(textField.getText()));
