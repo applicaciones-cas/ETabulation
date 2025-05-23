@@ -150,29 +150,6 @@ public class ETabulationController implements Initializable {
         }
     }
 
-    private void cmdTable_Keypress(KeyEvent event) {
-
-        if (event.getCode() == KeyCode.TAB) {
-            TablePosition<?, ?> pos = tblCandidate.getFocusModel().getFocusedCell();
-            int row = pos.getRow();
-            int col = pos.getColumn();
-            int colCount = tblCandidate.getVisibleLeafColumns().size();
-            int nextCol = (col + 1) % colCount;
-
-            while (nextCol == 0 || nextCol == colCount - 1
-                    || !tblCandidate.getVisibleLeafColumns().get(nextCol).isEditable()) {
-                nextCol = (nextCol + 1) % colCount;
-            }
-
-//            tblCandidate.getFocusModel().focus(row,
-//                    (TableColumn<TableModelETabulation.Result, ?>) tblCandidate.getVisibleLeafColumns().get(nextCol));
-//            tblCandidate.edit(row,
-//                    (TableColumn<TableModelETabulation.Result, ?>) tblCandidate.getVisibleLeafColumns().get(nextCol));
-            event.consume();
-        }
-
-    }
-
     private JSONObject initRecord() throws SQLException, GuanzonException, CloneNotSupportedException {
         JSONObject loJSON;
 
@@ -236,10 +213,6 @@ public class ETabulationController implements Initializable {
                     StackPane.setAlignment(textField, Pos.CENTER);
                     pane.getStyleClass().add("stack-pane-editable");
 
-                    // Commit edit on Enter key press
-                    textField.setOnAction(e -> {
-                        commitEdit(textField.getText());
-                    });
                     textField.setTextFormatter(new TextFormatter<String>(change -> {
                         String newText = change.getControlNewText();
 
@@ -263,13 +236,6 @@ public class ETabulationController implements Initializable {
 
                     textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
                         if (isNowFocused) {
-//                            int currentIndex = getTableView().getSelectionModel().getSelectedIndex();
-//                            if (currentIndex > pnRow
-//                                    || currentIndex < pnRow) {
-//                                pnRow = currentIndex;
-//                                loadParticipants();
-//                                getSelected(pnRow);
-//                            }
                             getTableView().getSelectionModel().select(getIndex());
 
                         } else {
@@ -286,6 +252,37 @@ public class ETabulationController implements Initializable {
                     });
                     textField.setOnMouseClicked(e -> {
                         getTableView().getSelectionModel().select(getIndex());
+                        int currentRow = getIndex();
+                        if (currentRow > pnRow || currentRow < pnRow) {
+
+                            loadParticipants();
+                            getSelected(currentRow);
+
+                            TableView<TableModelETabulation> table = getTableView();
+                            TableColumn<TableModelETabulation, ?> currentColumn = getTableColumn();
+                            int currentColIndex = table.getVisibleLeafIndex(currentColumn);
+                            TableColumn<TableModelETabulation, ?> nextCol = table.getVisibleLeafColumn(currentColIndex + 1);
+
+                            table.edit(currentRow, nextCol);
+
+                            TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, currentRow, currentColIndex);
+                            if (cell != null && cell.isEditing()) {
+                                Node graphic = cell.getGraphic();
+                                if (graphic instanceof StackPane) {
+                                    StackPane pane = (StackPane) graphic;
+                                    for (Node child : pane.getChildren()) {
+                                        if (child instanceof TextField) {
+                                            TextField tf = (TextField) child;
+                                            tf.requestFocus();
+                                            tf.selectAll();
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        getTableView().getSelectionModel().select(getIndex());
                     });
 
                     textField.setOnAction(e -> commitEdit(textField.getText()));
@@ -295,7 +292,7 @@ public class ETabulationController implements Initializable {
                             commitEdit(textField.getText());
 
                             TableView<TableModelETabulation> table = getTableView();
-                            int currentRow = getIndex();
+                            int currentRow = pnRow;
                             TableColumn<TableModelETabulation, ?> currentColumn = getTableColumn();
                             int currentColIndex = table.getVisibleLeafIndex(currentColumn);
                             int totalCols = table.getVisibleLeafColumns().size();
@@ -303,28 +300,16 @@ public class ETabulationController implements Initializable {
                             int nextRow = currentRow;
                             int nextColIndex;
 
-                            if (event.isShiftDown()) {
-                                if (currentColIndex > 1) {
-                                    nextColIndex = currentColIndex - 1;
-                                } else if (currentRow > 0) {
-                                    nextRow = currentRow - 1;
-                                    nextColIndex = totalCols - 2;
-                                } else {
-                                    event.consume();
-                                    return;
-                                }
+                            if (currentColIndex < totalCols - 2) {
+                                nextColIndex = currentColIndex + 1;
+                            } else if (currentRow < table.getItems().size() - 1) {
+                                nextRow = currentRow + 1;
+                                nextColIndex = 1;
+                                loadParticipants();
+                                pnRow = nextRow;
                             } else {
-                                if (currentColIndex < totalCols - 2) {
-                                    nextColIndex = currentColIndex + 1;
-                                } else if (currentRow < table.getItems().size() - 1) {
-                                    nextRow = currentRow + 1;
-                                    nextColIndex = 1;
-                                    loadParticipants();
-                                    pnRow = nextRow;
-                                } else {
-                                    event.consume();
-                                    return;
-                                }
+                                event.consume();
+                                return;
                             }
 
                             TableColumn<TableModelETabulation, ?> nextCol = table.getVisibleLeafColumn(nextColIndex);
@@ -350,17 +335,6 @@ public class ETabulationController implements Initializable {
                             lblContestantName.setText(paParticipants.get(finalNextRow).getIndex01().toString());
                             lblContestDetail.setText(paParticipants.get(finalNextRow).getIndex09().toString());
                             setContestantImage(finalNextRow + 1);
-
-                            // Optional: scroll the ScrollPane if needed (ensure it's roughly synced)
-                            double rowHeight = apCenterPanel.getHeight();
-                            double scrollY = finalNextRow * rowHeight;
-                            double scrollMax = tblCandidate.getItems().size() * rowHeight;
-                            double scrollValue = scrollY / scrollMax;
-
-                            // Clamp value between 0 and 1
-                            scrollValue = Math.min(1.0, Math.max(0.0, scrollValue));
-                            spCenter.setVvalue(scrollValue);
-                            event.consume();
                         }
                     });
                 }
@@ -634,13 +608,38 @@ public class ETabulationController implements Initializable {
 
     @FXML
     private void tblParticipantClick(MouseEvent event) {
+        int oldRow = pnRow;
         pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
-        if (pnRow < 0) {
+        if (pnRow <= 0) {
             return;
         }
-        getSelected(pnRow);
 
-        loadParticipants();
+        if (oldRow > pnRow || oldRow < pnRow) {
+
+            loadParticipants();
+            getSelected(oldRow);
+
+            TableView<TableModelETabulation> table = tblCandidate;
+            TableColumn<TableModelETabulation, ?> firstCol = table.getVisibleLeafColumn(1);
+
+            table.edit(pnRow, firstCol);
+
+            TableCell<TableModelETabulation, ?> cell = getCell(tblCandidate, pnRow, 1);
+            if (cell != null && cell.isEditing()) {
+                Node graphic = cell.getGraphic();
+                if (graphic instanceof StackPane) {
+                    StackPane pane = (StackPane) graphic;
+                    for (Node child : pane.getChildren()) {
+                        if (child instanceof TextField) {
+                            TextField tf = (TextField) child;
+                            tf.requestFocus();
+                            tf.selectAll();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         // Key navigation (Up/Down) handling as you had before
         tblCandidate.setOnKeyReleased((KeyEvent t) -> {
             KeyCode key = t.getCode();
