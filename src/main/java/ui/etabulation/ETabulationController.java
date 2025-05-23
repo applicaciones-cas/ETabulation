@@ -547,7 +547,7 @@ public class ETabulationController implements Initializable {
 
                     switch (lnCtrCriterea) {
                         case 0:
-                            index02Value = CommonUtils.NumberFormat(critValue, "#,#0.00");
+                            index02Value = CommonUtils.NumberFormat(critValue, "##0.00");
                             break;
                         case 1:
                             index03Value = CommonUtils.NumberFormat(critValue, "##0.00");
