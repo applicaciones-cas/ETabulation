@@ -261,7 +261,7 @@ public class ETabulationController implements Initializable {
                             TableView<TableModelETabulation> table = getTableView();
                             TableColumn<TableModelETabulation, ?> currentColumn = getTableColumn();
                             int currentColIndex = table.getVisibleLeafIndex(currentColumn);
-                            TableColumn<TableModelETabulation, ?> nextCol = table.getVisibleLeafColumn(currentColIndex + 1);
+                            TableColumn<TableModelETabulation, ?> nextCol = table.getVisibleLeafColumn(currentColIndex);
 
                             table.edit(currentRow, nextCol);
 
@@ -281,8 +281,7 @@ public class ETabulationController implements Initializable {
                                 }
                             }
                         }
-
-                        getTableView().getSelectionModel().select(getIndex());
+                        pnRow = currentRow;
                     });
 
                     textField.setOnAction(e -> commitEdit(textField.getText()));
