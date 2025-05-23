@@ -616,7 +616,7 @@ public class ETabulationController implements Initializable {
         if (oldRow > pnRow || oldRow < pnRow) {
 
             loadParticipants();
-            getSelected(oldRow);
+            getSelected(pnRow);
 
             TableView<TableModelETabulation> table = tblCandidate;
             TableColumn<TableModelETabulation, ?> firstCol = table.getVisibleLeafColumn(1);
