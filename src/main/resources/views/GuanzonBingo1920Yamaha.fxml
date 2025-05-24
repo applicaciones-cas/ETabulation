@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="apMain" prefHeight="700.0" prefWidth="1920.0" style="-fx-background-color: linear-gradient(to bottom right, #ffffff, #ffeaff, #e0fff4, #fffbcf, #e5e0ff); -fx-effect: dropshadow(gaussian, #facc15, 15, 0.5, 0, 0);" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="45.0">
+         <left>
+            <AnchorPane BorderPane.alignment="CENTER">
+               <children>
+                  <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <AnchorPane prefHeight="180.0">
+                           <children>
+                              <ImageView fitWidth="250.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <image>
+                                    <Image url="@../images/2025Logo%20(2).png" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fitWidth="250.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="270.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <image>
+                                    <Image url="@../images/yamaha.png" />
+                                 </image>
+                              </ImageView>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane>
+                           <VBox.margin>
+                              <Insets bottom="45.0" top="40.0" />
+                           </VBox.margin>
+                           <children>
+                              <HBox spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="260.0" prefWidth="220.0" style="-fx-background-color: #102E50; -fx-background-radius: 20;">
+                                       <children>
+                                          <Label fx:id="lblDrawLetter" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="B" textAlignment="CENTER" textFill="WHITE" wrapText="true" VBox.vgrow="NEVER">
+                                             <font>
+                                                <Font name="System Bold" size="96.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="-10.0" left="-20.0" right="-20.0" top="-20.0" />
+                                             </padding>
+                                          </Label>
+                                          <Label fx:id="lblDrawNo" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" graphicTextGap="0.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="1" textAlignment="CENTER" textFill="WHITE" VBox.vgrow="NEVER">
+                                             <font>
+                                                <Font name="System Bold" size="130.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="-30.0" left="-20.0" right="-20.0" top="-40.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                    </VBox>
+                                    <ImageView fx:id="ivPattern" fitHeight="260.0" fitWidth="220.0" pickOnBounds="true" preserveRatio="true" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                           <children>
+                              <HBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Button fx:id="btnBrowse" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #102E50; -fx-background-radius: 10;">
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="SEARCH" size="25" style="-fx-fill: WHITE;" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnNew" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #102E50; -fx-background-radius: 10;">
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="PLAY" size="25" style="-fx-fill: white;" />
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="btnReset" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: RED; -fx-background-radius: 10;" textFill="WHITE">
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="ROTATE_RIGHT" glyphStyle="WHITE" size="25" style="-fx-fill: white;" />
+                                       </graphic>
+                                    </Button>
+                                 </children></HBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets left="20.0" />
+                           </VBox.margin>
+                        </AnchorPane>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </left>
+         <center>
+            <AnchorPane BorderPane.alignment="CENTER">
+               <children>
+                  <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <AnchorPane style="-fx-background-color: #FF8200; -fx-background-radius: 90;">
+                           <children>
+                              <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="BINGO MOTORSIKLO" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <font>
+                                    <Font name="Arial Bold" size="96.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                           <children>
+                              <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <GridPane fx:id="gpDrawPanel" alignment="CENTER" hgap="10.0" layoutX="-14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="480.0" vgap="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                  <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                  <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
+                                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
+                                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
+                                    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
+                                    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
+                                </rowConstraints>
+                              </GridPane>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin></AnchorPane>
+                     </children>
+                  </VBox>
+               </children>
+               <BorderPane.margin>
+                  <Insets left="30.0" />
+               </BorderPane.margin></AnchorPane>
+         </center>
+         <bottom>
+            <TextField fx:id="txtDrawnNo" maxHeight="-Infinity" maxWidth="-Infinity" opacity="0.5" prefWidth="30.0" BorderPane.alignment="TOP_LEFT" />
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>

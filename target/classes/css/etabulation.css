@@ -24,8 +24,9 @@
     -fx-text-fill: #ABABAB;
     -fx-font-weight: bold;
     -fx-alignment: center;
+    -fx-font-wrap: center;
     -fx-font-size: 28px;
-    -fx-size: 40px;
+    -fx-size: 45px;
 }
 
 .table-row-cell {
@@ -33,18 +34,20 @@
     -fx-padding:-5px 0 0 0px;
     /*-fx-cell-size: 65px;*/
     -fx-background-radius:50px;
-    -fx-text-fill: #ABABAB;
 
 }
 .table-row-cell:empty {
     -fx-border-color: transparent;
-    -fx-background-color: transparent;
+    -fx-background-color: transparent !important;
 }
 .table-view .table-cell {
-    -fx-font-size: 18px;
+    -fx-font-size: 20px;
     -fx-alignment: center;
     -fx-font-family: "Arial";
+    -fx-text-fill: #131313;
+    -fx-font-weight: bold;
 }
+
 
 .table-row-cell:odd {
     -fx-background-color: #C6C6C6;
@@ -55,8 +58,6 @@
 .table-row-cell:filled:selected,
 .table-row-cell:focused:selected {
     -fx-background-color: #FC8001;
-    -fx-text-fill: #ABABAB;
-    -fx-font-weight: bold;
 }
 
 /* StackPane container for editable cell */
@@ -68,18 +69,18 @@
 
 /* Editable TextField inside TableCell */
 .stack-pane-editable .text-field {
-    -fx-background-color: #C4C4C4;
-    -fx-text-fill: black;
+    -fx-background-color: #D8D8D8;
+    -fx-text-fill: #131313;
     -fx-background-radius: 15px;
-    -fx-background-inset: -5px0 -5px 0 ;
     -fx-font-size: 20px;
     -fx-alignment: center;
-    -fx-padding: 0 20px 0 20px;
+    -fx-padding: 3px 0px 3px 0px;
 }
 
 /* Optional: On focus effect */
 .stack-pane-editable .text-field:focused {
     -fx-border-color: #FF8201;
+    -fx-text-fill: #3A3A3A;
     -fx-effect: dropshadow(three-pass-box, #FF8201, 5, 0, 0, 0);
 }
 
@@ -94,7 +95,7 @@
 }
 
 .table-cell:selected {
-    -fx-text-fill: #ABABAB;
+    -fx-text-fill: #ffffff;
 }
 
 .label {

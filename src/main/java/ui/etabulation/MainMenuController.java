@@ -35,6 +35,7 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRiderCAS;
 
 public class MainMenuController implements Initializable {
+
     public static GRiderCAS oApp;
     private final List<TranslateTransition> confettiAnimations = new ArrayList<>();
     private boolean isConfettiRunning = false;
@@ -45,8 +46,8 @@ public class MainMenuController implements Initializable {
     private MenuItem mnuAbout, mnuScoring, mnuClose, mnuBingo, mnuMinimize;
     @FXML
     private Pane pnMainCenter;
-    
-    double xOffset = 0; 
+
+    double xOffset = 0;
     double yOffset = 0;
 
     @Override
@@ -70,6 +71,14 @@ public class MainMenuController implements Initializable {
                 getStage().setIconified(true);
                 openWindow("GuanzonBingo1920", "Guanzon Bingo", false);
                 break;
+            case "mnuBingo1920Suzuki":
+                getStage().setIconified(true);
+                openWindow("GuanzonBingo1920Suzuki", "Guanzon Bingo", false);
+                break;
+            case "mnuBingo1920Yamaha":
+                getStage().setIconified(true);
+                openWindow("GuanzonBingo1920Yamaha", "Guanzon Bingo", false);
+                break;
             case "mnuBingo1080":
                 getStage().setIconified(true);
                 openWindow("GuanzonBingo1080", "Guanzon Bingo", false);
@@ -91,8 +100,8 @@ public class MainMenuController implements Initializable {
                 System.err.println("Unhandled menu: " + lsFormMenu);
         }
     }
-    
-    private Stage getStage(){
+
+    private Stage getStage() {
         return (Stage) apMain.getScene().getWindow();
     }
 
@@ -117,8 +126,7 @@ public class MainMenuController implements Initializable {
             fxLoader.setController(fxObj);
 
             Parent foParent = fxLoader.load();
-            
-            
+
             foParent.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
@@ -126,7 +134,7 @@ public class MainMenuController implements Initializable {
                     yOffset = event.getSceneY();
                 }
             });
-            
+
             foParent.setOnMouseDragged(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
@@ -146,7 +154,7 @@ public class MainMenuController implements Initializable {
                 newScene.setWidth(bounds.getWidth());
                 newScene.setHeight(bounds.getHeight());
             }
-            
+
             Scene childScene = new Scene(foParent);
             newScene.setTitle(fsTitle);
             newScene.setScene(childScene);
@@ -169,6 +177,18 @@ public class MainMenuController implements Initializable {
                 GBingoCtrl.setScreenSize(1080);
                 GBingoCtrl.setGRider(oApp);
 
+                return GBingoCtrl;
+            case "GuanzonBingo1920Suzuki":
+                GBingoCtrl = new GBingoController();
+                GBingoCtrl.setScreenSize(1920);
+                GBingoCtrl.setGRider(oApp);
+                //todo incase
+                return GBingoCtrl;
+            case "GuanzonBingo1920Yamaha":
+                GBingoCtrl = new GBingoController();
+                GBingoCtrl.setScreenSize(1920);
+                GBingoCtrl.setGRider(oApp);
+                //todo incase
                 return GBingoCtrl;
             case "GuanzonBingo1920":
                 GBingoCtrl = new GBingoController();

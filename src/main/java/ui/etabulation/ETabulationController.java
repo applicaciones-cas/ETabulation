@@ -24,7 +24,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -594,12 +593,6 @@ public class ETabulationController implements Initializable {
                 pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
                 getSelected(pnRow);
             }
-//            else {
-//                tblCandidate.getSelectionModel().select(pnRow);
-//                pnRow = tblCandidate.getSelectionModel().getSelectedIndex();
-//                getSelected(pnRow);
-//            }
-
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(ETabulationController.class.getName()).log(Level.SEVERE, null, ex);
         }
