@@ -229,7 +229,7 @@ public class ETabulationUtils {
     }
     
     // Animate row style changes: background color and height.
-    public static <T> void animateRowStyle(TableRow<T> row, Color targetColor, double targetHeight, Duration duration) {
+    public static <T> void animateRowStyle(TableRow<T> row, Color targetColor, double targetHeight) {
         ObjectProperty<Paint> bgColorProperty = (ObjectProperty<Paint>) row.getProperties().get("bgColor");
         if (bgColorProperty == null) {
             bgColorProperty = new SimpleObjectProperty<>(targetColor);
@@ -242,7 +242,7 @@ public class ETabulationUtils {
         if (!bgColorProperty.get().equals(targetColor)) {
             Timeline colorTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO, new KeyValue(bgColorProperty, bgColorProperty.get())),
-                new KeyFrame(duration, new KeyValue(bgColorProperty, targetColor))
+                new KeyFrame(Duration.millis(50), new KeyValue(bgColorProperty, targetColor))
             );
             colorTimeline.play();
         }
@@ -255,7 +255,7 @@ public class ETabulationUtils {
         if (currentHeight != targetHeight) {
             Timeline heightTimeline = new Timeline(
                 new KeyFrame(Duration.ZERO, new KeyValue(row.prefHeightProperty(), currentHeight)),
-                new KeyFrame(duration, new KeyValue(row.prefHeightProperty(), targetHeight))
+                new KeyFrame(Duration.millis(50), new KeyValue(row.prefHeightProperty(), targetHeight))
             );
             heightTimeline.play();
         }
@@ -270,13 +270,13 @@ public class ETabulationUtils {
             Color targetColor;
             double targetHeight;
             if (row.isSelected()) {
-                targetColor = Color.web("#FF8201");
-                targetHeight = 60;
+                    targetColor = Color.web("#FF8201");
+                targetHeight = 55;
             } else {
-                targetColor = (index % 2 == 0) ? Color.web("#d8d8d8") : Color.web("#b1b1b1");
+                targetColor = (index % 2 == 0) ? Color.web("#FFFFFF") : Color.web("#C5C5C5");
                 targetHeight = 40;
             }
-            animateRowStyle(row, targetColor, targetHeight, Duration.millis(300));
+            animateRowStyle(row, targetColor, targetHeight);
         }
     }
     
